@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Snapshot Testing Is Hard -- Pitfalls To Avoid - bradleyjkemp&#39;s Blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Bradley Kemp" />
+  <meta name="description" content="Snapshot testing is an extremely fast way to add regression testing to an existing project. You simply take some example inputs and then snapshot the resulting outputs. From then on, you can have a high degree of confidence that any changes you make have not affected backwards compatibility (as this would have been detected as a change in a snapshot).
+However there are many pitfalls you can run into as I found when writing cupaloy, a snapshot testing library for Go." />
+
+  <meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.32-DEV" />
+
+
+<link rel="canonical" href="https://bradleyjkemp.github.io/post/snapshot-testing-pitfalls/" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="icon" href="/favicon.ico" />
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+<link href="/dist/even.min.css?v=2.7.0" rel="stylesheet">
+<link href="/lib/fancybox/jquery.fancybox-3.1.20.min.css" rel="stylesheet">
+
+<meta property="og:title" content="Snapshot Testing Is Hard -- Pitfalls To Avoid" />
+<meta property="og:description" content="Snapshot testing is an extremely fast way to add regression testing to an existing project. You simply take some example inputs and then snapshot the resulting outputs. From then on, you can have a high degree of confidence that any changes you make have not affected backwards compatibility (as this would have been detected as a change in a snapshot).
+However there are many pitfalls you can run into as I found when writing cupaloy, a snapshot testing library for Go." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bradleyjkemp.github.io/post/snapshot-testing-pitfalls/" />
+
+
+
+<meta property="article:published_time" content="2017-12-19T12:21:26&#43;00:00"/>
+
+<meta property="article:modified_time" content="2017-12-19T12:21:26&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta itemprop="name" content="Snapshot Testing Is Hard -- Pitfalls To Avoid">
+<meta itemprop="description" content="Snapshot testing is an extremely fast way to add regression testing to an existing project. You simply take some example inputs and then snapshot the resulting outputs. From then on, you can have a high degree of confidence that any changes you make have not affected backwards compatibility (as this would have been detected as a change in a snapshot).
+However there are many pitfalls you can run into as I found when writing cupaloy, a snapshot testing library for Go.">
+
+
+<meta itemprop="datePublished" content="2017-12-19T12:21:26&#43;00:00" />
+<meta itemprop="dateModified" content="2017-12-19T12:21:26&#43;00:00" />
+<meta itemprop="wordCount" content="465">
+
+
+
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Snapshot Testing Is Hard -- Pitfalls To Avoid"/>
+<meta name="twitter:description" content="Snapshot testing is an extremely fast way to add regression testing to an existing project. You simply take some example inputs and then snapshot the resulting outputs. From then on, you can have a high degree of confidence that any changes you make have not affected backwards compatibility (as this would have been detected as a change in a snapshot).
+However there are many pitfalls you can run into as I found when writing cupaloy, a snapshot testing library for Go."/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">BJK</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">BJK</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Snapshot Testing Is Hard -- Pitfalls To Avoid</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2017-12-19 </span>
+        
+        <span class="more-meta"> 465 word </span>
+        <span class="more-meta"> 3 min read </span>
+      </div>
+    </header>
+
+    
+    
+<div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+<ul>
+<li><a href="#non-deterministic-snapshots">Non-deterministic snapshots</a></li>
+<li><a href="#diffable-snapshots">Diffable snapshots</a></li>
+<li><a href="#updating-snapshots-must-fail-your-tests">Updating snapshots must fail your tests</a></li>
+</ul>
+</nav>
+  </div>
+</div>
+
+    
+    <div class="post-content">
+      
+
+<p>Snapshot testing is an extremely fast way to add regression testing to an existing project.
+You simply take some example inputs and then snapshot the resulting outputs.
+From then on, you can have a high degree of confidence that any changes you make have not affected backwards compatibility (as this would have been detected as a change in a snapshot).</p>
+
+<p>However there are many pitfalls you can run into as I found when writing <a href="https://github.com/bradleyjkemp/cupaloy">cupaloy</a>, a snapshot testing library for Go.</p>
+
+<h1 id="non-deterministic-snapshots">Non-deterministic snapshots</h1>
+
+<p>The most obvious problem you run into is that the output you&rsquo;re snapshotting has to be completely deterministic for this to work.</p>
+
+<p>Take for example this CLI output from <a href="https://gohugo.io/">Hugo</a>:</p>
+
+<pre><code class="language-Log">Built site for language en:
+1 of 1 draft rendered
+1 regular pages created
+8 other pages created
+1 paginator pages created
+total in 10 ms
+</code></pre>
+
+<p>Here we have a line reporting how long the command took. This is a useful feature to the user but will make snapshot testing practically impossible: your tests are likely going to fail unless run on exactly the same machine used to create the snapshot.</p>
+
+<p>Instead we&rsquo;ll need to remove this non-deterministic output:</p>
+
+<ul>
+<li>We could add a command line option to omit that log line. This works but now means we&rsquo;ve lost test coverage for that line.</li>
+<li>Add logic to the logging to output a constant, dummy value during a test.</li>
+<li>Put the output through some rewrite rules to replace any variable outputs with constant ones e.g. using regex to find <code>total in [0-9]+ ms</code> and replacing it with <code>total in T ms</code></li>
+</ul>
+
+<p>A similar problem will arise if you timestamp your log outputs, again either add an option to disable this or use something to set the clock at a fixed time.</p>
+
+<h1 id="diffable-snapshots">Diffable snapshots</h1>
+
+<p>Snapshots are only useful if they help you identify <em>what</em> has changed about your output. It&rsquo;s no use snapshotting an opaque blob of bytes.</p>
+
+<p>For text output this means you want your snapshots formatted nicely so that your snapshot library can easily show you a diff of the changes.</p>
+
+<p>For snapshotting more complex data structures you want to ensure that they&rsquo;re pretty-printed in order to make comparing changes easy.</p>
+
+<h1 id="updating-snapshots-must-fail-your-tests">Updating snapshots must fail your tests</h1>
+
+<p>Most importantly: updating your snapshots must fail that test run!</p>
+
+<p>It&rsquo;s far too easy for <code>UPDATE_SNAPSHOTS=true</code> to sneak into your environment variables in CI and from then on, all your snapshot tests will pass regardless of what has changed.</p>
+
+<p>To prevent this you can:</p>
+
+<ul>
+<li>Have your snapshot update process detect that it&rsquo;s running in CI and refuse to update the snapshots: tests will then fail if the snapshots would have changed.</li>
+<li>Use a snapshot testing library that combines the update and test processes, this way the library can fail your tests directly if snapshots get updated.</li>
+</ul>
+
+    </div>
+
+    
+    
+
+    
+    
+
+    <footer class="post-footer">
+      
+
+      
+      <nav class="post-nav">
+        
+        
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    (function() {
+        
+        
+        if (window.location.hostname === 'localhost') return;
+
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        var disqus_shortname = 'bradleyjkemp-github-io';
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com/" class="dsq-brlink" target="_blank">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+  
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="https://www.linkedin.com/in/bradleyjkemp" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/bradleyjkemp" class="iconfont icon-github" title="github"></a>
+      <a href="true" class="iconfont icon-artdashes" title="artdashes"></a>
+  <a href="https://bradleyjkemp.github.io/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <span class="copyright-year">
+    &copy; 
+    2017
+    <span class="heart">
+      <i class="iconfont icon-heart"></i>
+    </span>
+    <span class="author">Bradley Kemp</span>
+  </span>
+</div>
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+<script src="/lib/highlight/highlight.pack.js?v=20171001"></script>
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="/lib/slideout/slideout-1.0.1.min.js"></script>
+  <script type="text/javascript" src="/lib/fancybox/jquery.fancybox-3.1.20.min.js"></script>
+<script type="text/javascript" src="/dist/even.min.js?v=2.7.0"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      showProcessingMessages: false,
+      messageStyle: 'none'
+    };
+  </script>
+  <script async src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML'></script>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-111372185-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+
+</body>
+</html>
