@@ -4,7 +4,7 @@
 <head><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name=" robots" content="noindex, nofollow">
+<meta name="robots" content="index, follow">
 <title>Snapshot Testing Is Hard -- Pitfalls To Avoid | bradleyjkemp</title>
 
 <meta name="keywords" content="" />
@@ -24,6 +24,52 @@ However there are many pitfalls you can run into as I found when writing cupaloy
 <meta name="msapplication-TileColor" content="#2e2e33">
 <meta name="generator" content="Hugo 0.79.0" />
 
+
+<meta property="og:title" content="Snapshot Testing Is Hard -- Pitfalls To Avoid" />
+<meta property="og:description" content="Snapshot testing is an extremely fast way to add regression testing to an existing project. You simply take some example inputs and then snapshot the resulting outputs. From then on, you can have a high degree of confidence that any changes you make have not affected backwards compatibility (as this would have been detected as a change in a snapshot).
+However there are many pitfalls you can run into as I found when writing cupaloy, a snapshot testing library for Go." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bradleyjkemp.dev/post/snapshot-testing-pitfalls/" />
+<meta property="article:published_time" content="2017-12-19T12:21:26+00:00" />
+<meta property="article:modified_time" content="2017-12-19T12:21:26+00:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Snapshot Testing Is Hard -- Pitfalls To Avoid"/>
+<meta name="twitter:description" content="Snapshot testing is an extremely fast way to add regression testing to an existing project. You simply take some example inputs and then snapshot the resulting outputs. From then on, you can have a high degree of confidence that any changes you make have not affected backwards compatibility (as this would have been detected as a change in a snapshot).
+However there are many pitfalls you can run into as I found when writing cupaloy, a snapshot testing library for Go."/>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Snapshot Testing Is Hard -- Pitfalls To Avoid",
+  "name": "Snapshot Testing Is Hard -- Pitfalls To Avoid",
+  "description": "Snapshot testing is an extremely fast way to add regression testing to an existing project. You simply take some example inputs and then snapshot the resulting outputs. From then …",
+  "keywords": [
+    
+  ],
+  "articleBody": "Snapshot testing is an extremely fast way to add regression testing to an existing project. You simply take some example inputs and then snapshot the resulting outputs. From then on, you can have a high degree of confidence that any changes you make have not affected backwards compatibility (as this would have been detected as a change in a snapshot).\nHowever there are many pitfalls you can run into as I found when writing cupaloy, a snapshot testing library for Go.\nNon-deterministic snapshots The most obvious problem you run into is that the output you’re snapshotting has to be completely deterministic for this to work.\nTake for example this CLI output from Hugo:\nBuilt site for language en: 1 of 1 draft rendered 1 regular pages created 8 other pages created 1 paginator pages created total in 10 ms Here we have a line reporting how long the command took. This is a useful feature to the user but will make snapshot testing practically impossible: your tests are likely going to fail unless run on exactly the same machine used to create the snapshot.\nInstead we’ll need to remove this non-deterministic output:\n We could add a command line option to omit that log line. This works but now means we’ve lost test coverage for that line. Add logic to the logging to output a constant, dummy value during a test. Put the output through some rewrite rules to replace any variable outputs with constant ones e.g. using regex to find total in [0-9]+ ms and replacing it with total in T ms  A similar problem will arise if you timestamp your log outputs, again either add an option to disable this or use something to set the clock at a fixed time.\nDiffable snapshots Snapshots are only useful if they help you identify what has changed about your output. It’s no use snapshotting an opaque blob of bytes.\nFor text output this means you want your snapshots formatted nicely so that your snapshot library can easily show you a diff of the changes.\nFor snapshotting more complex data structures you want to ensure that they’re pretty-printed in order to make comparing changes easy.\nUpdating snapshots must fail your tests Most importantly: updating your snapshots must fail that test run!\nIt’s far too easy for UPDATE_SNAPSHOTS=true to sneak into your environment variables in CI and from then on, all your snapshot tests will pass regardless of what has changed.\nTo prevent this you can:\n Have your snapshot update process detect that it’s running in CI and refuse to update the snapshots: tests will then fail if the snapshots would have changed. Use a snapshot testing library that combines the update and test processes, this way the library can fail your tests directly if snapshots get updated.  ",
+  "wordCount" : "465",
+  "inLanguage": "en",
+  "datePublished": "2017-12-19T12:21:26Z",
+  "dateModified": "2017-12-19T12:21:26Z",
+  "author":{
+    "@type": "Person",
+    "name": "Bradley Kemp"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://bradleyjkemp.dev/post/snapshot-testing-pitfalls/"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "bradleyjkemp",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://bradleyjkemp.dev/favicon.ico"
+    }
+  }
+}
+</script>
 
 
 
