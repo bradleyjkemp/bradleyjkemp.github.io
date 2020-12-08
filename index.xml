@@ -8,11 +8,11 @@
     <language>en</language>
     <lastBuildDate>Tue, 08 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://bradleyjkemp.dev/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Why honeypots work so damn well</title>
-      <link>https://bradleyjkemp.dev/post/why-honeypots-work-so-damn-well/</link>
+      <title>How intrusion detection honeypots work so well</title>
+      <link>https://bradleyjkemp.dev/post/how-intrusion-detection-honeypots-work-so-well/</link>
       <pubDate>Tue, 08 Dec 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://bradleyjkemp.dev/post/why-honeypots-work-so-damn-well/</guid>
+      <guid>https://bradleyjkemp.dev/post/how-intrusion-detection-honeypots-work-so-well/</guid>
       <description>Intrusion detection honeypots are just plain cool. They&amp;rsquo;re incredibly simple to run and give you extremely accurate alerts about intruders in your systems.
 A honeypot can be as simple as a fake server inside your network that alerts if anyone connects to it. There&amp;rsquo;s no reason to intentionally connect to this bogus server, so any attempts are probably an attacker already inside your network.
 Unfortunately, that&amp;rsquo;s about as far as most people get with them.</description>
