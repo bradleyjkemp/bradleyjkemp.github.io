@@ -4,16 +4,21 @@
   
   <url>
     <loc>https://bradleyjkemp.dev/</loc>
-    <lastmod>2017-12-19T12:21:26+00:00</lastmod>
+    <lastmod>2020-12-08T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://bradleyjkemp.dev/post/</loc>
-    <lastmod>2017-12-19T12:21:26+00:00</lastmod>
+    <lastmod>2020-12-08T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://bradleyjkemp.dev/post/snapshot-testing-pitfalls/</loc>
+    <loc>https://bradleyjkemp.dev/post/why-honeypots-work-so-damn-well/</loc>
+    <lastmod>2020-12-08T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://bradleyjkemp.dev/post/snapshot-testing-is-hard-pitfalls-to-avoid/</loc>
     <lastmod>2017-12-19T12:21:26+00:00</lastmod>
   </url>
   

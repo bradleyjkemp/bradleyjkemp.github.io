@@ -6,13 +6,24 @@
     <description>Recent content on bradleyjkemp</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Tue, 19 Dec 2017 12:21:26 +0000</lastBuildDate><atom:link href="https://bradleyjkemp.dev/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 08 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://bradleyjkemp.dev/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Why honeypots work so damn well</title>
+      <link>https://bradleyjkemp.dev/post/why-honeypots-work-so-damn-well/</link>
+      <pubDate>Tue, 08 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://bradleyjkemp.dev/post/why-honeypots-work-so-damn-well/</guid>
+      <description>Intrusion detection honeypots are just plain cool. They&amp;rsquo;re incredibly simple to run and give you extremely accurate alerts about intruders in your systems.
+A honeypot can be as simple as a fake server inside your network that alerts if anyone connects to it. There&amp;rsquo;s no reason to intentionally connect to this bogus server, so any attempts are probably an attacker already inside your network.
+Unfortunately, that&amp;rsquo;s about as far as most people get with them.</description>
+    </item>
+    
     <item>
       <title>Snapshot Testing Is Hard -- Pitfalls To Avoid</title>
-      <link>https://bradleyjkemp.dev/post/snapshot-testing-pitfalls/</link>
+      <link>https://bradleyjkemp.dev/post/snapshot-testing-is-hard-pitfalls-to-avoid/</link>
       <pubDate>Tue, 19 Dec 2017 12:21:26 +0000</pubDate>
       
-      <guid>https://bradleyjkemp.dev/post/snapshot-testing-pitfalls/</guid>
+      <guid>https://bradleyjkemp.dev/post/snapshot-testing-is-hard-pitfalls-to-avoid/</guid>
       <description>Snapshot testing is an extremely fast way to add regression testing to an existing project. You simply take some example inputs and then snapshot the resulting outputs. From then on, you can have a high degree of confidence that any changes you make have not affected backwards compatibility (as this would have been detected as a change in a snapshot).
 However there are many pitfalls you can run into as I found when writing cupaloy, a snapshot testing library for Go.</description>
     </item>
