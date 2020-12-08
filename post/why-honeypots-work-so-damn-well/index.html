@@ -8,9 +8,9 @@
 <title>Why honeypots work so damn well | bradleyjkemp</title>
 
 <meta name="keywords" content="" />
-<meta name="description" content="Intrusion Detection Honeypots are the classic example of my favourite type of alert: &ldquo;this thing should never happen, shout at me if it does&rdquo;.
-What does malicious look like? Skeleton:
- Intro  What is a honeypot   Introduce &ldquo;expected behaviour graph&rdquo;  ">
+<meta name="description" content="Intrusion detection honeypots are just plain cool. They&rsquo;re incredibly simple to run and give you extremely accurate alerts about intruders in your systems.
+A honeypot can be as simple as a fake server inside your network that alerts if anyone connects to it. There&rsquo;s no reason to intentionally connect to this bogus server, so any attempts are probably an attacker already inside your network.
+Unfortunately, that&rsquo;s about as far as most people get with them.">
 <meta name="author" content="Bradley Kemp">
 <link rel="canonical" href="https://bradleyjkemp.dev/post/why-honeypots-work-so-damn-well/" />
 <link href="https://bradleyjkemp.dev/assets/css/stylesheet.min.62447981861ad5bc7761e73be43801fe136a2aaaa8b7afd18ce582c358716848.css" integrity="sha256-YkR5gYYa1bx3Yec75DgB/hNqKqqot6/RjOWCw1hxaEg=" rel="preload stylesheet"
@@ -27,18 +27,19 @@ What does malicious look like? Skeleton:
 
 
 <meta property="og:title" content="Why honeypots work so damn well" />
-<meta property="og:description" content="Intrusion Detection Honeypots are the classic example of my favourite type of alert: &ldquo;this thing should never happen, shout at me if it does&rdquo;.
-What does malicious look like? Skeleton:
- Intro  What is a honeypot   Introduce &ldquo;expected behaviour graph&rdquo;  " />
+<meta property="og:description" content="Intrusion detection honeypots are just plain cool. They&rsquo;re incredibly simple to run and give you extremely accurate alerts about intruders in your systems.
+A honeypot can be as simple as a fake server inside your network that alerts if anyone connects to it. There&rsquo;s no reason to intentionally connect to this bogus server, so any attempts are probably an attacker already inside your network.
+Unfortunately, that&rsquo;s about as far as most people get with them." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bradleyjkemp.dev/post/why-honeypots-work-so-damn-well/" />
-<meta property="article:published_time" content="2017-12-19T12:21:26+00:00" />
-<meta property="article:modified_time" content="2017-12-19T12:21:26+00:00" />
-<meta name="twitter:card" content="summary"/>
+<meta property="og:image" content="https://bradleyjkemp.dev/cover.png" /><meta property="article:published_time" content="2020-12-08T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-12-08T00:00:00+00:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://bradleyjkemp.dev/cover.png" />
 <meta name="twitter:title" content="Why honeypots work so damn well"/>
-<meta name="twitter:description" content="Intrusion Detection Honeypots are the classic example of my favourite type of alert: &ldquo;this thing should never happen, shout at me if it does&rdquo;.
-What does malicious look like? Skeleton:
- Intro  What is a honeypot   Introduce &ldquo;expected behaviour graph&rdquo;  "/>
+<meta name="twitter:description" content="Intrusion detection honeypots are just plain cool. They&rsquo;re incredibly simple to run and give you extremely accurate alerts about intruders in your systems.
+A honeypot can be as simple as a fake server inside your network that alerts if anyone connects to it. There&rsquo;s no reason to intentionally connect to this bogus server, so any attempts are probably an attacker already inside your network.
+Unfortunately, that&rsquo;s about as far as most people get with them."/>
 
 <script type="application/ld+json">
 {
@@ -46,15 +47,15 @@ What does malicious look like? Skeleton:
   "@type": "BlogPosting",
   "headline": "Why honeypots work so damn well",
   "name": "Why honeypots work so damn well",
-  "description": "Intrusion Detection Honeypots are the classic example of my favourite type of alert: \u0026amp;ldquo;this thing should never happen, shout at me if it does\u0026amp;rdquo;.\nWhat does malicious look …",
+  "description": "Intrusion detection honeypots are just plain cool. They\u0026amp;rsquo;re incredibly simple to run and give you extremely accurate alerts about intruders in your systems.\nA honeypot can be …",
   "keywords": [
     
   ],
-  "articleBody": "Intrusion Detection Honeypots are the classic example of my favourite type of alert: “this thing should never happen, shout at me if it does”.\nWhat does malicious look like? Skeleton:\n Intro  What is a honeypot   Introduce “expected behaviour graph”  ",
-  "wordCount" : "39",
+  "articleBody": "Intrusion detection honeypots are just plain cool. They’re incredibly simple to run and give you extremely accurate alerts about intruders in your systems.\nA honeypot can be as simple as a fake server inside your network that alerts if anyone connects to it. There’s no reason to intentionally connect to this bogus server, so any attempts are probably an attacker already inside your network.\nUnfortunately, that’s about as far as most people get with them. It’s a shame that so often honeypots get written off as just a novelty—no more than a neat trick to catch pentesters. Most people miss the point behind honeypots.\nIn fact, honeypots just scrape the surface of a really powerful detection tactic—the “this should never happen” alert.\nMapping out the usage patterns Before you can write a “this should never happen” alert, you first need know what actually does happen in your system. This boils down to threat modelling: how do real users interact with your system and how could attackers abuse it?\nThere are many ways to do threat modelling but here we’re going to think about usage patterns: the different things users can do and how likely they are to do them. Taking the example of an SSH server, you might end up with something like this:   Along the x-axis we’ve put the various interactions someone might have with the server. On the y-axis there’s how often we expect to see that behaviour. It’s a bit of a stretch to draw this as a line graph—there’s no real relation between adjacent points—but it’s a useful mental picture.\nBut, let’s keep things even simpler and focus on how three specific features get used:\n Public-key auth. All of our users should be logging in with SSH keys. On the other hand, if an attacker is able to steal an SSH key they’re also likely to use it. Password auth. We don’t expect a real user to try passwords—none of them have password authentication enabled. But, an attacker will probably try some default or phished passwords. Port-forwarding. Both our real users and attackers are likely to use this.  If you’re tasked with detecting malicious use of this SSH server, where do you start?\nYour instinct might be to start with alerting on events that could actually cause damage. Logging in with a stolen SSH key, or using port-forwarding to spread laterally both get an attacker closer to their goals. Makes sense you’d want to detect this.\nBut, trying to build good alerts is going to be tough—these are the things our real users are most likely to do too.   Detecting just the bad SSH logins without flagging lots of real user logins is going to be tough. Here be machine learning dragons!\nWhy not start with alerting on failed password authentication attempts instead? Failed password attempts are fairly harmless, so it’s natural to ignore them, but there’s a lot going in their favour:\n You don’t need to care about false positives—real users should always be using an SSH key. An attacker is pretty likely to try using a default or phished password to login. It’s dead simple to alert on. We don’t even have to look at the details of the log event, just its existence is cause for alarm.  The fact that a real user should never cause a failed password login event is exactly why its useful. Anyone that fails a password login is probably an intruder bumbling around not realising that everyone uses SSH keys.\nI think this is the first tactic to learn from honeypots:  #callout { background: var(--code-bg); padding: 1.5em 1.25em; border-radius: 3px; display: flex; flex-direction: row; margin-bottom: 20px; } #callout-inner { margin-left: 1em; } @media (max-width: 767px) { #callout { padding: 1.5em 0.75em 1.5em 0.6em; } #callout-inner { margin-left: 0.5em; } }  🍯 It’s hard to spot an attacker in a sea of real users. Instead, detect the things that only an attacker would do.  \nHoneypots manipulate usage patterns Alerting on failed password authentications is useful but isn’t perfect. If an attacker stays within the normal behaviour of our users, they’ll never hit one of our “this should never happen” tripwires.\nUnfortunately, we’re limited by the usage pattern of our real users, and it doesn’t look like there’s any more natural “this should never happen” opportunities in our SSH server.\nThis is where we could deploy a honeypot. Rather than opportunistically looking for “this should never happen” situations in actual systems, honeypots just create their own. They let us conjure systems that real users never use but where an attacker is likely to go poking around.   We can alert on almost any activity from an SSH honeypot. Because the honeypot serves no use, we never expect a real user to login, and certainly don’t expect any port-forwarding. Apart from an occasional health-check, any events we see coming out of this server are worth investigating.\nBut, on it’s own, a system without any user activity isn’t interesting—it’s easy to deploy a useless server that no one ever interacts with. A honeypot’s trick is to be useless while still making an attacker think it’s a useful. The more important it seems, the more likely an attacker wants to go explore it.\nBy using deception, the honeypot has a completely different malicious usage pattern from its expected usage pattern. This difference gives us maximum opportunity to write “this should never happen” alerts.\nThis then is the other tactic to learn from honeypots:  #callout { background: var(--code-bg); padding: 1.5em 1.25em; border-radius: 3px; display: flex; flex-direction: row; margin-bottom: 20px; } #callout-inner { margin-left: 1em; } @media (max-width: 767px) { #callout { padding: 1.5em 0.75em 1.5em 0.6em; } #callout-inner { margin-left: 0.5em; } }  🍯 Usage patterns are flexible—by employing deception, you can shape them to create opportunities for high quality alerts.  \nSo… just deploy honeypots everywhere then? While you could start deploying honeypots all over your network, actually I think straight-up honeypots are a bit of a novelty. Instead, it’s the honeypot tactics that are far more useful than honeypots themselves. Create a situation that should never legitimately happen and then alert if it does.\nWhy just deploy a honeypot SSH server when you could apply honeypot tactics to all your real SSH servers too?\nFurther reading  Part two of this series (in progress) where we’ll look at applying these tactics. Grab a copy of Intrusion Detection Honeypots by Chris Sanders for a deeper dive into the psychology behind honeypots and lots of real examples. To start playing with your own honeypots, take a look at CanaryTokens and OpenCanary.  ",
+  "wordCount" : "1094",
   "inLanguage": "en",
-  "datePublished": "2017-12-19T12:21:26Z",
-  "dateModified": "2017-12-19T12:21:26Z",
+  "image":"https://bradleyjkemp.dev/cover.png","datePublished": "2020-12-08T00:00:00Z",
+  "dateModified": "2020-12-08T00:00:00Z",
   "author":{
     "@type": "Person",
     "name": "Bradley Kemp"
@@ -80,7 +81,11 @@ What does malicious look like? Skeleton:
 
 <body class="" id="top">
 <script>
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
         document.body.classList.add('dark');
     }
 
@@ -99,6 +104,28 @@ What does malicious look like? Skeleton:
         <div class="logo">
             <a href="https://bradleyjkemp.dev" accesskey="h">bradleyjkemp</a>
             <span class="logo-switches">
+                <span class="theme-toggle">
+                    <a id="theme-toggle" accesskey="t">
+                        <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                    </a>
+                </span>
                 
             </span>
         </div>
@@ -115,23 +142,151 @@ What does malicious look like? Skeleton:
     </h1>
     <div class="post-meta">
 
-December 19, 2017&nbsp;·&nbsp;1 min&nbsp;·&nbsp;Bradley Kemp
+December 8, 2020&nbsp;·&nbsp;Bradley Kemp
 
     </div>
   </header> 
+<figure class="entry-cover">
+        <img srcset="https://bradleyjkemp.dev/post/why-honeypots-work-so-damn-well/cover_huf0758e6f6a42f34978188d38dee42248_115102_360x0_resize_box_2.png 360w ,https://bradleyjkemp.dev/post/why-honeypots-work-so-damn-well/cover_huf0758e6f6a42f34978188d38dee42248_115102_480x0_resize_box_2.png 480w ,https://bradleyjkemp.dev/post/why-honeypots-work-so-damn-well/cover_huf0758e6f6a42f34978188d38dee42248_115102_720x0_resize_box_2.png 720w ,https://bradleyjkemp.dev/post/why-honeypots-work-so-damn-well/cover_huf0758e6f6a42f34978188d38dee42248_115102_1080x0_resize_box_2.png 1080w ,https://bradleyjkemp.dev/post/why-honeypots-work-so-damn-well/cover_huf0758e6f6a42f34978188d38dee42248_115102_1500x0_resize_box_2.png 1500w ,https://bradleyjkemp.dev/post/why-honeypots-work-so-damn-well/cover.png 1877w"
+            sizes="(min-width: 768px) 720px, 100vw" src="https://bradleyjkemp.dev/post/why-honeypots-work-so-damn-well/cover.png" alt="" />
+        
+</figure>
 
   <div class="post-content">
-<p>Intrusion Detection Honeypots are the classic example of my favourite type of alert: &ldquo;this thing should never happen, shout at me if it does&rdquo;.</p>
-<h2 id="what-does-malicious-look-like">What does malicious look like?<a hidden class="anchor" aria-hidden="true" href="#what-does-malicious-look-like">#</a></h2>
-<p><img src="./honeypots/activity-map.svg" alt="foo"></p>
-<p>Skeleton:</p>
+<p>Intrusion detection honeypots are just plain cool.
+They&rsquo;re incredibly simple to run and give you extremely accurate alerts about intruders in your systems.</p>
+<p>A honeypot can be as simple as a fake server inside your network that alerts if anyone connects to it.
+There&rsquo;s no reason to intentionally connect to this bogus server, so any attempts are probably an attacker already inside your network.</p>
+<p>Unfortunately, that&rsquo;s about as far as most people get with them.
+It&rsquo;s a shame that so often honeypots get written off as just a novelty&mdash;no more than a neat trick to catch pentesters.
+Most people miss the point behind honeypots.</p>
+<p>In fact, honeypots just scrape the surface of a really powerful detection tactic&mdash;the &ldquo;this should never happen&rdquo; alert.</p>
+<h3 id="mapping-out-the-usage-patterns">Mapping out the usage patterns<a hidden class="anchor" aria-hidden="true" href="#mapping-out-the-usage-patterns">#</a></h3>
+<p>Before you can write a &ldquo;this should never happen&rdquo; alert, you first need know what actually <em>does</em> happen in your system.
+This boils down to threat modelling: how do real users interact with your system and how could attackers abuse it?</p>
+<p>There are many ways to do threat modelling but here we&rsquo;re going to think about usage patterns: the different things users can do and how likely they are to do them.
+Taking the example of an SSH server, you might end up with something like this:
+<figure>
+    <img src="usage-pattern.png"/> 
+</figure>
+</p>
+<p>Along the x-axis we&rsquo;ve put the various interactions someone might have with the server.
+On the y-axis there&rsquo;s how often we expect to see that behaviour.
+It&rsquo;s a bit of a stretch to draw this as a line graph&mdash;there&rsquo;s no real relation between adjacent points&mdash;but it&rsquo;s a useful mental picture.</p>
+<p>But, let&rsquo;s keep things even simpler and focus on how three specific features get used:</p>
 <ul>
-<li>Intro
-<ul>
-<li>What is a honeypot</li>
+<li><strong>Public-key auth</strong>. All of our users should be logging in with SSH keys. On the other hand, if an attacker is able to steal an SSH key they&rsquo;re also likely to use it.</li>
+<li><strong>Password auth</strong>. We don&rsquo;t expect a real user to try passwords&mdash;none of them have password authentication enabled. But, an attacker will probably try some default or phished passwords.</li>
+<li><strong>Port-forwarding</strong>. Both our real users and attackers are likely to use this.</li>
 </ul>
-</li>
-<li>Introduce &ldquo;expected behaviour graph&rdquo;</li>
+<p>If you&rsquo;re tasked with detecting malicious use of this SSH server, where do you start?</p>
+<p>Your instinct might be to start with alerting on events that could actually cause damage.
+Logging in with a stolen SSH key, or using port-forwarding to spread laterally both get an attacker closer to their goals.
+Makes sense you&rsquo;d want to detect this.</p>
+<p>But, trying to build good alerts is going to be tough&mdash;these are the things our real users are most likely to do too.
+<figure>
+    <img src="usage-pattern-detection.png"/> 
+</figure>
+</p>
+<p>Detecting just the bad SSH logins without flagging lots of real user logins is going to be tough.
+<em>Here be machine learning dragons!</em></p>
+<p>Why not start with alerting on failed password authentication attempts instead?
+Failed password attempts are fairly harmless, so it&rsquo;s natural to ignore them, but there&rsquo;s a lot going in their favour:</p>
+<ul>
+<li>You don&rsquo;t need to care about false positives&mdash;real users should always be using an SSH key.</li>
+<li>An attacker is pretty likely to try using a default or phished password to login.</li>
+<li>It&rsquo;s dead simple to alert on. We don&rsquo;t even have to look at the details of the log event, just its existence is cause for alarm.</li>
+</ul>
+<p>The fact that a real user should never cause a failed password login event is exactly why its useful.
+Anyone that fails a password login is probably an intruder bumbling around not realising that everyone uses SSH keys.</p>
+<p>I think this is the first tactic to learn from honeypots:
+
+<style>
+  #callout {
+    background: var(--code-bg);
+    padding: 1.5em 1.25em;
+    border-radius: 3px;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 20px;
+  }
+  #callout-inner {
+    margin-left: 1em;
+  }
+  @media (max-width: 767px) {
+    #callout {
+    padding: 1.5em 0.75em 1.5em 0.6em;
+    }
+    #callout-inner {
+      margin-left: 0.5em;
+    }
+  }
+</style>
+<div id="callout" style="">
+  <div>🍯</div>
+	<div id="callout-inner">
+    It&rsquo;s hard to spot an attacker in a sea of real users. Instead, detect the things that only an attacker would do.
+  </div>
+</div></p>
+<h3 id="honeypots-manipulate-usage-patterns">Honeypots manipulate usage patterns<a hidden class="anchor" aria-hidden="true" href="#honeypots-manipulate-usage-patterns">#</a></h3>
+<p>Alerting on failed password authentications is useful but isn&rsquo;t perfect.
+If an attacker stays within the normal behaviour of our users, they&rsquo;ll never hit one of our &ldquo;this should never happen&rdquo; tripwires.</p>
+<p>Unfortunately, we&rsquo;re limited by the usage pattern of our real users, and it doesn&rsquo;t look like there&rsquo;s any more natural &ldquo;this should never happen&rdquo; opportunities in our SSH server.</p>
+<p>This is where we could deploy a honeypot.
+Rather than opportunistically looking for &ldquo;this should never happen&rdquo; situations in actual systems, honeypots just create their own.
+They let us conjure systems that real users never use but where an attacker is likely to go poking around.
+<figure>
+    <img src="honeypot-usage.png"
+         alt="The usage patterns for a honeypot SSH server. Expected malicious usage is unchanged but expected legitimate usage is now almost non-existent."/> 
+</figure>
+</p>
+<p>We can alert on almost any activity from an SSH honeypot.
+Because the honeypot serves no use, we never expect a real user to login, and certainly don&rsquo;t expect any port-forwarding.
+Apart from an occasional health-check, any events we see coming out of this server are worth investigating.</p>
+<p>But, on it&rsquo;s own, a system without any user activity isn&rsquo;t interesting&mdash;it&rsquo;s easy to deploy a useless server that no one ever interacts with.
+A honeypot&rsquo;s trick is to be useless while still making an attacker <em>think</em> it&rsquo;s a useful.
+The more important it seems, the more likely an attacker wants to go explore it.</p>
+<p>By using deception, the honeypot has a completely different malicious usage pattern from its expected usage pattern.
+This difference gives us maximum opportunity to write &ldquo;this should never happen&rdquo; alerts.</p>
+<p>This then is the other tactic to learn from honeypots:
+
+<style>
+  #callout {
+    background: var(--code-bg);
+    padding: 1.5em 1.25em;
+    border-radius: 3px;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 20px;
+  }
+  #callout-inner {
+    margin-left: 1em;
+  }
+  @media (max-width: 767px) {
+    #callout {
+    padding: 1.5em 0.75em 1.5em 0.6em;
+    }
+    #callout-inner {
+      margin-left: 0.5em;
+    }
+  }
+</style>
+<div id="callout" style="">
+  <div>🍯</div>
+	<div id="callout-inner">
+    Usage patterns are flexible&mdash;by employing deception, you can shape them to create opportunities for high quality alerts.
+  </div>
+</div></p>
+<h3 id="so-just-deploy-honeypots-everywhere-then">So&hellip; just deploy honeypots everywhere then?<a hidden class="anchor" aria-hidden="true" href="#so-just-deploy-honeypots-everywhere-then">#</a></h3>
+<p>While you could start deploying honeypots all over your network, actually I think straight-up honeypots <strong>are</strong> a bit of a novelty.
+Instead, it&rsquo;s the honeypot tactics that are far more useful than honeypots themselves.
+Create a situation that should never legitimately happen and then alert if it does.</p>
+<p>Why just deploy a honeypot SSH server when you could apply honeypot tactics to all your real SSH servers too?</p>
+<h3 id="further-reading">Further reading<a hidden class="anchor" aria-hidden="true" href="#further-reading">#</a></h3>
+<ul>
+<li>Part two of this series (in progress) where we&rsquo;ll look at applying these tactics.</li>
+<li>Grab a copy of <a href="https://smile.amazon.co.uk/dp/1735188301">Intrusion Detection Honeypots</a> by <a href="https://chrissanders.org">Chris Sanders</a> for a deeper dive into the psychology behind honeypots and lots of real examples.</li>
+<li>To start playing with your own honeypots, take a look at <a href="https://canarytokens.org">CanaryTokens</a> and <a href="https://opencanary.readthedocs.io">OpenCanary</a>.</li>
 </ul>
 
 </div>
@@ -233,6 +388,18 @@ December 19, 2017&nbsp;·&nbsp;1 min&nbsp;·&nbsp;Bradley Kemp
     function menu_on_scroll() {
         localStorage.setItem("menu-scroll-position", document.getElementById('menu').scrollLeft);
     }
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
 
 </script>
 
