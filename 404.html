@@ -11,7 +11,7 @@
 <meta name="description" content="">
 <meta name="author" content="Bradley Kemp">
 <link rel="canonical" href="https://bradleyjkemp.dev/404.html" />
-<link href="https://bradleyjkemp.dev/assets/css/stylesheet.min.62447981861ad5bc7761e73be43801fe136a2aaaa8b7afd18ce582c358716848.css" integrity="sha256-YkR5gYYa1bx3Yec75DgB/hNqKqqot6/RjOWCw1hxaEg=" rel="preload stylesheet"
+<link href="https://bradleyjkemp.dev/assets/css/stylesheet.min.59a10eb884470c904bcc1163ba8102dac99054bcfbe97d5b16993d0044e84d1a.css" integrity="sha256-WaEOuIRHDJBLzBFjuoEC2smQVLz76X1bFpk9AEToTRo=" rel="preload stylesheet"
     as="style">
 
 <link rel="icon" href="https://bradleyjkemp.dev/favicon.ico">
@@ -59,9 +59,9 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://bradleyjkemp.dev" accesskey="h">bradleyjkemp</a>
+            <a href="https://bradleyjkemp.dev" accesskey="h" title="bradleyjkemp (Alt + H)">bradleyjkemp</a>
             <span class="logo-switches">
-                <span class="theme-toggle">
+                <span class="theme-toggle" title="(Alt + T)">
                     <a id="theme-toggle" accesskey="t">
                         <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -94,16 +94,17 @@
 <div class="not-found">404</div>
 
     </main><footer class="footer">
-    <span>&copy; 2020 <a href="https://bradleyjkemp.dev">bradleyjkemp</a></span>
+    <span>&copy; 2021 <a href="https://bradleyjkemp.dev">bradleyjkemp</a></span>
     <span>&middot;</span>
     <span>Powered by <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a></span>
     <span>&middot;</span>
     <span>Theme <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a></span>
 </footer>
-<a href="#top" aria-label="go to top" title="Go to Top" accesskey="g">
-    <button class="top-link" id="top-link" type="button">
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)">
+    <button class="top-link" id="top-link" type="button" accesskey="g">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6">
-            <path d="M12 6H0l6-6z" /></svg>
+            <path d="M12 6H0l6-6z" />
+        </svg>
     </button>
 </a>
 
@@ -122,6 +123,11 @@
             document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
                 behavior: "smooth"
             });
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.replaceState(null, null, `#${id}`);
+            }
         });
     });
     var mybutton = document.getElementById("top-link");
