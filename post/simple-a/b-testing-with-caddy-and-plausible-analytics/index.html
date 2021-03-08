@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Simple A/B testing with Caddy and Plausible Analytics | bradleyjkemp</title>
+
+<meta name="keywords" content="" />
+<meta name="description" content="A/B testing is a life saver for a solo SaaS developer. While it&rsquo;s hard to predict whether a 14-day or 1-month trial is going to get a better signup rate, it&rsquo;s really simple to test: show half of people the 14-day button and the other half the 1-month button and just measure the click-through rate.
+There&rsquo;s loads of tools out there to help you do this, but rule #1 of running a micro-SaaS like QueryCal is to keep your technology stack simple&mdash;it&rsquo;s better to focus your time on features not integrating a bunch of different technologies.">
+<meta name="author" content="Bradley Kemp">
+<link rel="canonical" href="https://querycal.com/docs/posts/simple-ab-testing-with-caddy/" />
+<link href="https://bradleyjkemp.dev/assets/css/stylesheet.min.fafc3735bf4bc905437d0238e86406b02e0bbb0ada2c500ded4346cadd0dcda8.css" integrity="sha256-&#43;vw3Nb9LyQVDfQI46GQGsC4LuwraLFAN7UNGyt0Nzag=" rel="preload stylesheet"
+    as="style">
+
+<link rel="icon" href="https://bradleyjkemp.dev/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://bradleyjkemp.dev/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://bradleyjkemp.dev/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://bradleyjkemp.dev/apple-touch-icon.png">
+<link rel="mask-icon" href="https://bradleyjkemp.dev/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<meta name="generator" content="Hugo 0.80.0" />
+<link rel="webmention" href="https://webmention.io/bradleyjkemp.dev/webmention" />
+<link rel="pingback" href="https://webmention.io/bradleyjkemp.dev/xmlrpc" />
+
+
+
+<!-- plausible.io section --><!-- Preconnect to required origins -->
+<link rel="preconnect" href='https://stats.bradleyjkemp.dev'>
+
+    
+    
+        
+            
+                
+<script async defer data-domain="bradleyjkemp.dev" src='https://stats.bradleyjkemp.dev/js/plausible.js'></script>
+
+        
+        
+        
+<script>window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+
+        
+<!-- Specific script for plausible.io -->
+        
+        
+<script>
+     
+    
+     
+     
+</script>
+
+        
+<!-- If you are using Content-Security-Policy, do not forget to add this code to your CSP : 
+  script-src 'unsafe-inline' https://stats.bradleyjkemp.dev
+  connect-src 'unsafe-inline' https://stats.bradleyjkemp.dev
+  or just add the partial 'plausible.csp.html' to those 2 csp directive in your 'index.headers' file
+-->
+
+        
+<!-- End of plausible.io section -->
+<meta property="og:title" content="Simple A/B testing with Caddy and Plausible Analytics" />
+<meta property="og:description" content="A/B testing is a life saver for a solo SaaS developer. While it&rsquo;s hard to predict whether a 14-day or 1-month trial is going to get a better signup rate, it&rsquo;s really simple to test: show half of people the 14-day button and the other half the 1-month button and just measure the click-through rate.
+There&rsquo;s loads of tools out there to help you do this, but rule #1 of running a micro-SaaS like QueryCal is to keep your technology stack simple&mdash;it&rsquo;s better to focus your time on features not integrating a bunch of different technologies." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bradleyjkemp.dev/post/simple-a/b-testing-with-caddy-and-plausible-analytics/" />
+<meta property="og:image" content="https://bradleyjkemp.dev/post/simple-a/b-testing-with-caddy-and-plausible-analytics/querycal-ab-architecture.png" /><meta property="article:published_time" content="2021-03-08T00:00:00+00:00" />
+<meta property="article:modified_time" content="2021-03-08T00:00:00+00:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://bradleyjkemp.dev/post/simple-a/b-testing-with-caddy-and-plausible-analytics/querycal-ab-architecture.png" />
+<meta name="twitter:title" content="Simple A/B testing with Caddy and Plausible Analytics"/>
+<meta name="twitter:description" content="A/B testing is a life saver for a solo SaaS developer. While it&rsquo;s hard to predict whether a 14-day or 1-month trial is going to get a better signup rate, it&rsquo;s really simple to test: show half of people the 14-day button and the other half the 1-month button and just measure the click-through rate.
+There&rsquo;s loads of tools out there to help you do this, but rule #1 of running a micro-SaaS like QueryCal is to keep your technology stack simple&mdash;it&rsquo;s better to focus your time on features not integrating a bunch of different technologies."/>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Simple A/B testing with Caddy and Plausible Analytics",
+  "name": "Simple A\/B testing with Caddy and Plausible Analytics",
+  "description": "A/B testing is a life saver for a solo SaaS developer. While it\u0026amp;rsquo;s hard to predict whether a 14-day or 1-month trial is going to get a better signup rate, it\u0026amp;rsquo;s really …",
+  "keywords": [
+    
+  ],
+  "articleBody": "A/B testing is a life saver for a solo SaaS developer. While it’s hard to predict whether a 14-day or 1-month trial is going to get a better signup rate, it’s really simple to test: show half of people the 14-day button and the other half the 1-month button and just measure the click-through rate.\nThere’s loads of tools out there to help you do this, but rule #1 of running a micro-SaaS like QueryCal is to keep your technology stack simple—it’s better to focus your time on features not integrating a bunch of different technologies.\nHere’s how QueryCal does A/B testing using only Caddy, a static site generator, and Plausible Analytics.\nQueryCal’s web architecture QueryCal’s web architecture is very simple. There’s a public facing Caddy server which forwards requests to either the landing page or the docs site. These two sites are themselves just simple static file servers.\nThe Caddy config looks like this (I’m using docker-compose so web.landing resolves to the IP of the container serving the landing page):\nquerycal.com/docs { reverse_proxy web.docs:80 } querycal.com { reverse_proxy web.landing:80 } So, how is this simple setup going to do A/B testing? It needs to:\n Be able to serve two different experimental variants of the site Split visitors evenly into the two experiments Track which experiment each visitor was seeing when they signed up  Most A/B testing solutions would need some backend code to accomplish this, but with some clever use of Caddy, it’s possible to do all this while still keeping the architecture simple and only using static file servers:\nChallenge 1: Serving A/B versions of a static site The QueryCal landing page is just some plain HTML, CSS, and JS that’s bundled up using a bundler called Parcel.\nNormally you’d want Parcel to generate a single output from your static site but we’re going to use a plugin called posthtml-expressions to generate the two variants.\nThis plugin adds some basic conditionals so we can write HTML like this:\nif condition=\"variantA\"a href=\"/register?trial=14\"14-day free trialaif elsea href=\"/register?trial=28\"1-month free trialaelse At build time this gets processed and converted into either the 14-day or the 1-month button depending on whether the condition “variantA” is true. We can set this condition based on an environment variable using a posthtml.config.js file like this:\nmodule.exports = { plugins: [ require(\"posthtml-expressions\")({ locals: { variantA: process.env.VARIANT === \"A\" }, }), ], }; Now when we run VARIANT=A parcel build we’ll get one version of our site and when we run VARIANT=B parcel build we’ll get the other!\nChallenge 2: Splitting visitors into A/B variants with Caddy Now that we can easily generate two different variants of a static site, we need a way to randomly show each to half of the visitors.\nIdeally the solution needs to:\n Split visitors as close to 50:50 as possible (otherwise it confuses working out which experiment performed best) Consistently show the same variant of the site to each individual (it’d be confusing if the page kept changing when you reloaded it) Not require cookies (that’d defeat the point of using a cookie-free analytics like Plausible)  Luckily Caddy has a directive that can do exactly this: a reverse_proxy that uses the ip_hash load balancing policy.\nquerycal.com { reverse_proxy web.landing.a:80 web.landing.b:80 { lb_policy ip_hash } } This Caddyfile means, for requests to querycal.com:\n First, Caddy takes the visitor’s IP and hashes it If the hash is “even”, Caddy reverse-proxies the request to web.landing.a If the hash is “odd”, Caddy reverse-proxies the request to web.landing.b  This is great because it means:\n Visitors will be very evenly split between the two variants As long as a visitor’s IP remains the same, they’ll always see the same variant All without requiring any cookies!  Challenge 3: Tracking A/B conversion rate with Plausible Analytics Now that we’ve got visitors being shown the two variants of our site, all that’s left is to track the success rate of each. This is easily done by extending the if-else to use Plausible’s custom props feature.\nif condition=\"variantA\"a href=\"/register?trial=14\" onclick=\"plausible('signup', {props: {variant: '14-day'}}\"14-day free trialaif elsea href=\"/register?trial=28\" onclick=\"plausible('signup', {props: {variant: '1-month'}}\"1-month free trialaelse Now when someone signs up through the 14-day trial button, a conversion gets logged with the tag variant: 14-day and when someone signs up through the 1-month trial button, a conversion gets logged with the tag variant: 1-month.\nLimitations of this method While this is a nice simple way to implement A/B testing, it does have some limitations compared to a more full-featured A/B testing solution. But, these limitations are fairly minor and, for small sites like QueryCal, are are definitely worth the tradeoff.\nThe A/B split is only done on IP, not per-visitor Because we’re using the visitor’s IP address to decide which variant to show, there’s a chance that ##. It’s common for universities and phone providers to put all of their users behind a small number of IP addresses rather than assigning them all unique ones (using Carrier-grade NAT). This could cause some problems with the data because all of these people will be shown one variant and not the other.\nIt only supports a fixed number of variants Full-featured A/B testing tools will let you create many different variants of a button and pit them all against each other. Because we have to statically generate each version of the site, this technique only really works for a small number of variants.\nSimultaneous experiments get bundled together Say I’m running two simultaneous experiments: the 14-day vs 1-month button test and another test of whether the pricing information should come before or after the demo.\nA proper A/B testing tool would show 4 different versions of the site:\n 14-day trial, pricing first 14-day trial, demo first 1-month trial, pricing first 1-month trial, demo first  But because we’re statically generating the versions of our site we get just two:\n 14-day trial, pricing first 1-month trial, demo first  What is QueryCal? QueryCal takes your calendars and lets you query them as if they were an SQL database. It uses the real SQLite query engine so you can write queries to:\n Calculate metrics based on your calendar events. Correlate events between your different calendars. Alert based on upcoming events.  Sound useful? Sign up for a free trial.\n",
+  "wordCount" : "1037",
+  "inLanguage": "en",
+  "image":"https://bradleyjkemp.dev/post/simple-a/b-testing-with-caddy-and-plausible-analytics/querycal-ab-architecture.png","datePublished": "2021-03-08T00:00:00Z",
+  "dateModified": "2021-03-08T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "Bradley Kemp"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://bradleyjkemp.dev/post/simple-a/b-testing-with-caddy-and-plausible-analytics/"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "bradleyjkemp",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://bradleyjkemp.dev/favicon.ico"
+    }
+  }
+}
+</script>
+
+
+
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+<noscript>
+    <style type="text/css">
+        .theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://bradleyjkemp.dev" accesskey="h" title="bradleyjkemp (Alt + H)">bradleyjkemp</a>
+            <span class="logo-switches">
+                <a id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </a>
+                
+                
+            </span>
+        </div>
+        <ul id="menu" onscroll="menu_on_scroll()"></ul>
+    </nav>
+</header>
+
+    <main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">
+      Simple A/B testing with Caddy and Plausible Analytics
+    </h1>
+    <div class="post-meta">
+
+March 8, 2021&nbsp;·&nbsp;5 min&nbsp;·&nbsp;Bradley Kemp
+
+    </div>
+  </header> 
+<figure class="entry-cover">
+        <img srcset="https://bradleyjkemp.dev/post/simple-a/b-testing-with-caddy-and-plausible-analytics/querycal-ab-architecture_hue4453d642e1ee53203a03651752498d2_127913_360x0_resize_box_2.png 360w ,https://bradleyjkemp.dev/post/simple-a/b-testing-with-caddy-and-plausible-analytics/querycal-ab-architecture_hue4453d642e1ee53203a03651752498d2_127913_480x0_resize_box_2.png 480w ,https://bradleyjkemp.dev/post/simple-a/b-testing-with-caddy-and-plausible-analytics/querycal-ab-architecture_hue4453d642e1ee53203a03651752498d2_127913_720x0_resize_box_2.png 720w ,https://bradleyjkemp.dev/post/simple-a/b-testing-with-caddy-and-plausible-analytics/querycal-ab-architecture_hue4453d642e1ee53203a03651752498d2_127913_1080x0_resize_box_2.png 1080w ,https://bradleyjkemp.dev/post/simple-a/b-testing-with-caddy-and-plausible-analytics/querycal-ab-architecture_hue4453d642e1ee53203a03651752498d2_127913_1500x0_resize_box_2.png 1500w ,https://bradleyjkemp.dev/post/simple-a/b-testing-with-caddy-and-plausible-analytics/querycal-ab-architecture.png 1681w"
+            sizes="(min-width: 768px) 720px, 100vw" src="https://bradleyjkemp.dev/post/simple-a/b-testing-with-caddy-and-plausible-analytics/querycal-ab-architecture.png" alt="" />
+        
+</figure>
+
+  <div class="post-content">
+<p>A/B testing is a life saver for a solo SaaS developer.
+While it&rsquo;s hard to predict whether a 14-day or 1-month trial is going to get a better signup rate, it&rsquo;s really simple to test:
+show half of people the 14-day button and the other half the 1-month button and just measure the click-through rate.</p>
+<p>There&rsquo;s loads of tools out there to help you do this, but rule #1 of running a micro-SaaS like QueryCal is to keep your technology stack simple&mdash;it&rsquo;s better to focus your time on features not integrating a bunch of different technologies.</p>
+<p>Here&rsquo;s how QueryCal does A/B testing using only <a href="https://caddyserver.com/">Caddy</a>, a static site generator, and <a href="https://plausible.io/">Plausible Analytics</a>.</p>
+<h2 id="querycals-web-architecture">QueryCal&rsquo;s web architecture<a hidden class="anchor" aria-hidden="true" href="#querycals-web-architecture">#</a></h2>
+<p><img src="querycal-architecture.png" alt="A boxes and arrows diagram showing a Caddy server on the edge of the network proxying requests to either web.landing or web.docs depending on the request"></p>
+<p>QueryCal&rsquo;s web architecture is very simple. There&rsquo;s a public facing <a href="https://caddyserver.com/">Caddy</a> server which forwards requests to either the landing page or the docs site. These two sites are themselves just simple static file servers.</p>
+<p>The Caddy config looks like this (I&rsquo;m using <code>docker-compose</code> so <code>web.landing</code> resolves to the IP of the container serving the landing page):</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Caddyfile" data-lang="Caddyfile">querycal.com/docs {
+    <span style="color:#66d9ef">reverse_proxy</span> web.docs:<span style="color:#ae81ff">80</span>
+}
+
+querycal.com {
+    <span style="color:#66d9ef">reverse_proxy</span> web.landing:<span style="color:#ae81ff">80</span>
+}
+</code></pre></div><p>So, how is this simple setup going to do A/B testing? It needs to:</p>
+<ol>
+<li>Be able to serve two different experimental variants of the site</li>
+<li>Split visitors evenly into the two experiments</li>
+<li>Track which experiment each visitor was seeing when they signed up</li>
+</ol>
+<p>Most A/B testing solutions would need some backend code to accomplish this, but with some clever use of Caddy, it&rsquo;s possible to do all this while still keeping the architecture simple and only using static file servers:</p>
+<p><img src="querycal-ab-architecture.png" alt="The same boxes and arrows diagram as before but now there&rsquo;s two copies of web.landing: web.landing.a and web.landing.b"></p>
+<h2 id="challenge-1-serving-ab-versions-of-a-static-site">Challenge 1: Serving A/B versions of a static site<a hidden class="anchor" aria-hidden="true" href="#challenge-1-serving-ab-versions-of-a-static-site">#</a></h2>
+<p>The <a href="https://querycal.com">QueryCal landing page</a> is just some plain HTML, CSS, and JS that&rsquo;s bundled up using a bundler called <a href="https://parceljs.org/">Parcel</a>.</p>
+<p>Normally you&rsquo;d want Parcel to generate a single output from your static site but we&rsquo;re going to use a plugin called <a href="https://github.com/posthtml/posthtml-expressions"><code>posthtml-expressions</code></a> to generate the two variants.</p>
+<p>This plugin adds some basic conditionals so we can write HTML like this:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">if</span> <span style="color:#a6e22e">condition</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;variantA&#34;</span>&gt;&lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/register?trial=14&#34;</span>&gt;14-day free trial&lt;/<span style="color:#f92672">a</span>&gt;&lt;/<span style="color:#f92672">if</span>&gt;
+&lt;<span style="color:#f92672">else</span>&gt;&lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/register?trial=28&#34;</span>&gt;1-month free trial&lt;/<span style="color:#f92672">a</span>&gt;&lt;/<span style="color:#f92672">else</span>&gt;
+</code></pre></div><p>At build time this gets processed and converted into <em>either</em> the 14-day or the 1-month button depending on whether the condition &ldquo;variantA&rdquo; is true.
+We can set this condition based on an environment variable using a <code>posthtml.config.js</code> file like this:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="color:#a6e22e">module</span>.<span style="color:#a6e22e">exports</span> <span style="color:#f92672">=</span> {
+  <span style="color:#a6e22e">plugins</span><span style="color:#f92672">:</span> [
+    <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;posthtml-expressions&#34;</span>)({
+      <span style="color:#a6e22e">locals</span><span style="color:#f92672">:</span> { <span style="color:#a6e22e">variantA</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">process</span>.<span style="color:#a6e22e">env</span>.<span style="color:#a6e22e">VARIANT</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;A&#34;</span> },
+    }),
+  ],
+};
+</code></pre></div><p>Now when we run <code>VARIANT=A parcel build</code> we&rsquo;ll get one version of our site and when we run <code>VARIANT=B parcel build</code> we&rsquo;ll get the other!</p>
+<h2 id="challenge-2-splitting-visitors-into-ab-variants-with-caddy">Challenge 2: Splitting visitors into A/B variants with Caddy<a hidden class="anchor" aria-hidden="true" href="#challenge-2-splitting-visitors-into-ab-variants-with-caddy">#</a></h2>
+<p>Now that we can easily generate two different variants of a static site, we need a way to randomly show each to half of the visitors.</p>
+<p>Ideally the solution needs to:</p>
+<ul>
+<li>Split visitors as close to 50:50 as possible (otherwise it confuses working out which experiment performed best)</li>
+<li>Consistently show the same variant of the site to each individual (it&rsquo;d be confusing if the page kept changing when you reloaded it)</li>
+<li>Not require cookies (that&rsquo;d defeat the point of using a cookie-free analytics like Plausible)</li>
+</ul>
+<p>Luckily Caddy has a directive that can do exactly this: a <code>reverse_proxy</code> that uses the <code>ip_hash</code> load balancing policy.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Caddyfile" data-lang="Caddyfile">querycal.com {
+    <span style="color:#66d9ef">reverse_proxy</span> web.landing.a:<span style="color:#ae81ff">80</span> web.landing.b:<span style="color:#ae81ff">80</span> {
+        <span style="color:#66d9ef">lb_policy</span> <span style="color:#e6db74">ip_hash</span>
+    }
+}
+</code></pre></div><p>This Caddyfile means, for requests to <a href="https://querycal.com">querycal.com</a>:</p>
+<ol>
+<li>First, Caddy takes the visitor&rsquo;s IP and hashes it</li>
+<li>If the hash is &ldquo;even&rdquo;, Caddy reverse-proxies the request to <code>web.landing.a</code></li>
+<li>If the hash is &ldquo;odd&rdquo;, Caddy reverse-proxies the request to <code>web.landing.b</code></li>
+</ol>
+<p>This is great because it means:</p>
+<ul>
+<li>Visitors will be very evenly split between the two variants</li>
+<li>As long as a visitor&rsquo;s IP remains the same, they&rsquo;ll always see the same variant</li>
+<li>All without requiring any cookies!</li>
+</ul>
+<h2 id="challenge-3-tracking-ab-conversion-rate-with-plausible-analytics">Challenge 3: Tracking A/B conversion rate with Plausible Analytics<a hidden class="anchor" aria-hidden="true" href="#challenge-3-tracking-ab-conversion-rate-with-plausible-analytics">#</a></h2>
+<p>Now that we&rsquo;ve got visitors being shown the two variants of our site, all that&rsquo;s left is to track the success rate of each.
+This is easily done by extending the if-else to use Plausible&rsquo;s <a href="https://plausible.io/docs/custom-event-goals#using-custom-props">custom props</a> feature.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">if</span> <span style="color:#a6e22e">condition</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;variantA&#34;</span>&gt;&lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/register?trial=14&#34;</span> <span style="color:#a6e22e">onclick</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;plausible(&#39;signup&#39;, {props: {variant: &#39;14-day&#39;}}&#34;</span>&gt;14-day free trial&lt;/<span style="color:#f92672">a</span>&gt;&lt;/<span style="color:#f92672">if</span>&gt;
+&lt;<span style="color:#f92672">else</span>&gt;&lt;<span style="color:#f92672">a</span> <span style="color:#a6e22e">href</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/register?trial=28&#34;</span> <span style="color:#a6e22e">onclick</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;plausible(&#39;signup&#39;, {props: {variant: &#39;1-month&#39;}}&#34;</span>&gt;1-month free trial&lt;/<span style="color:#f92672">a</span>&gt;&lt;/<span style="color:#f92672">else</span>&gt;
+</code></pre></div><p>Now when someone signs up through the 14-day trial button, a conversion gets logged with the tag <code>variant: 14-day</code> and when someone signs up through the 1-month trial button, a conversion gets logged with the tag <code>variant: 1-month</code>.</p>
+<h2 id="limitations-of-this-method">Limitations of this method<a hidden class="anchor" aria-hidden="true" href="#limitations-of-this-method">#</a></h2>
+<p>While this is a nice simple way to implement A/B testing, it does have some limitations compared to a more full-featured A/B testing solution.
+But, these limitations are fairly minor and, for small sites like QueryCal, are are <em><strong>definitely</strong></em> worth the tradeoff.</p>
+<h3 id="the-ab-split-is-only-done-on-ip-not-per-visitor">The A/B split is only done on IP, not per-visitor<a hidden class="anchor" aria-hidden="true" href="#the-ab-split-is-only-done-on-ip-not-per-visitor">#</a></h3>
+<p>Because we&rsquo;re using the visitor&rsquo;s IP address to decide which variant to show, there&rsquo;s a chance that ##.
+It&rsquo;s common for universities and phone providers to put all of their users behind a small number of IP addresses rather than assigning them all unique ones (using <a href="https://en.wikipedia.org/wiki/Carrier-grade_NAT">Carrier-grade NAT</a>).
+This could cause some problems with the data because all of these people will be shown one variant and not the other.</p>
+<h3 id="it-only-supports-a-fixed-number-of-variants">It only supports a fixed number of variants<a hidden class="anchor" aria-hidden="true" href="#it-only-supports-a-fixed-number-of-variants">#</a></h3>
+<p>Full-featured A/B testing tools will let you create many different variants of a button and pit them all against each other.
+Because we have to statically generate each version of the site, this technique only really works for a small number of variants.</p>
+<h3 id="simultaneous-experiments-get-bundled-together">Simultaneous experiments get bundled together<a hidden class="anchor" aria-hidden="true" href="#simultaneous-experiments-get-bundled-together">#</a></h3>
+<p>Say I&rsquo;m running two simultaneous experiments: the 14-day vs 1-month button test and another test of whether the pricing information should come before or after the demo.</p>
+<p>A proper A/B testing tool would show 4 different versions of the site:</p>
+<ul>
+<li>14-day trial, pricing first</li>
+<li>14-day trial, demo first</li>
+<li>1-month trial, pricing first</li>
+<li>1-month trial, demo first</li>
+</ul>
+<p>But because we&rsquo;re statically generating the versions of our site we get just two:</p>
+<ul>
+<li>14-day trial, pricing first</li>
+<li>1-month trial, demo first</li>
+</ul>
+<h2 id="what-is-querycal">What is QueryCal?<a hidden class="anchor" aria-hidden="true" href="#what-is-querycal">#</a></h2>
+<p>QueryCal takes your calendars and lets you query them as if they were an SQL database.
+It uses the real SQLite query engine so you can write queries to:</p>
+<ul>
+<li>Calculate metrics based on your calendar events.</li>
+<li>Correlate events between your different calendars.</li>
+<li>Alert based on upcoming events.</li>
+</ul>
+<p>Sound useful? <a href="https://querycal.com">Sign up for a free trial</a>.</p>
+
+</div>
+  <footer class="post-footer">
+    <nav class="paginav">
+      <a class="next" href="https://bradleyjkemp.dev/post/assurance-alerts-when-measuring-false-positive-rate-can-be-misleading/">
+        <span class="title">Next Page »</span>
+        <br>
+        <span>Assurance alerts: when measuring false-positive rate can be misleading</span>
+      </a>
+    </nav>
+
+
+
+<div class="share-buttons">
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Simple A/B testing with Caddy and Plausible Analytics on twitter"
+        href="https://twitter.com/intent/tweet/?text=Simple%20A%2fB%20testing%20with%20Caddy%20and%20Plausible%20Analytics&amp;url=https%3a%2f%2fbradleyjkemp.dev%2fpost%2fsimple-a%2fb-testing-with-caddy-and-plausible-analytics%2f&amp;hashtags=">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-253.927,424.544c135.939,0 210.268,-112.643 210.268,-210.268c0,-3.218 0,-6.437 -0.153,-9.502c14.406,-10.421 26.973,-23.448 36.935,-38.314c-13.18,5.824 -27.433,9.809 -42.452,11.648c15.326,-9.196 26.973,-23.602 32.49,-40.92c-14.252,8.429 -30.038,14.56 -46.896,17.931c-13.487,-14.406 -32.644,-23.295 -53.946,-23.295c-40.767,0 -73.87,33.104 -73.87,73.87c0,5.824 0.613,11.494 1.992,16.858c-61.456,-3.065 -115.862,-32.49 -152.337,-77.241c-6.284,10.881 -9.962,23.601 -9.962,37.088c0,25.594 13.027,48.276 32.95,61.456c-12.107,-0.307 -23.448,-3.678 -33.41,-9.196l0,0.92c0,35.862 25.441,65.594 59.311,72.49c-6.13,1.686 -12.72,2.606 -19.464,2.606c-4.751,0 -9.348,-0.46 -13.946,-1.38c9.349,29.426 36.628,50.728 68.965,51.341c-25.287,19.771 -57.164,31.571 -91.8,31.571c-5.977,0 -11.801,-0.306 -17.625,-1.073c32.337,21.15 71.264,33.41 112.95,33.41Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Simple A/B testing with Caddy and Plausible Analytics on linkedin"
+        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fbradleyjkemp.dev%2fpost%2fsimple-a%2fb-testing-with-caddy-and-plausible-analytics%2f&amp;title=Simple%20A%2fB%20testing%20with%20Caddy%20and%20Plausible%20Analytics&amp;summary=Simple%20A%2fB%20testing%20with%20Caddy%20and%20Plausible%20Analytics&amp;source=https%3a%2f%2fbradleyjkemp.dev%2fpost%2fsimple-a%2fb-testing-with-caddy-and-plausible-analytics%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Simple A/B testing with Caddy and Plausible Analytics on reddit"
+        href="https://reddit.com/submit?url=https%3a%2f%2fbradleyjkemp.dev%2fpost%2fsimple-a%2fb-testing-with-caddy-and-plausible-analytics%2f&title=Simple%20A%2fB%20testing%20with%20Caddy%20and%20Plausible%20Analytics">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Simple A/B testing with Caddy and Plausible Analytics on facebook"
+        href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2fbradleyjkemp.dev%2fpost%2fsimple-a%2fb-testing-with-caddy-and-plausible-analytics%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Simple A/B testing with Caddy and Plausible Analytics on whatsapp"
+        href="https://api.whatsapp.com/send?text=Simple%20A%2fB%20testing%20with%20Caddy%20and%20Plausible%20Analytics%20-%20https%3a%2f%2fbradleyjkemp.dev%2fpost%2fsimple-a%2fb-testing-with-caddy-and-plausible-analytics%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Simple A/B testing with Caddy and Plausible Analytics on telegram"
+        href="https://telegram.me/share/url?text=Simple%20A%2fB%20testing%20with%20Caddy%20and%20Plausible%20Analytics&amp;url=https%3a%2f%2fbradleyjkemp.dev%2fpost%2fsimple-a%2fb-testing-with-caddy-and-plausible-analytics%2f">
+        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28">
+            <path
+                d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+        </svg>
+    </a>
+</div>
+
+  </footer>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="//cdn-images.mailchimp.com/embedcode/classic-10_7.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+    #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+     
+</style>
+<div id="mc_embed_signup">
+    <form action="https://dev.us7.list-manage.com/subscribe/post?u=d9ccca3191f132a65b2088839&amp;id=3593d3bd31" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+        <div id="mc_embed_signup_scroll">
+            <h2>Subscribe to get an email for every new post</h2>
+            <div class="mc-field-group">
+                <label for="mce-EMAIL">Email Address </label>
+                <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL">
+            </div>
+            <div id="mce-responses" class="clear">
+                <div class="response" id="mce-error-response" style="display:none"></div>
+                <div class="response" id="mce-success-response" style="display:none"></div>
+            </div>    
+            <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_d9ccca3191f132a65b2088839_3593d3bd31" tabindex="-1" value=""></div>
+            <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+        </div>
+    </form>
+</div>
+
+
+</article>
+    </main><footer class="footer">
+    <span>&copy; 2021 <a href="https://bradleyjkemp.dev">bradleyjkemp</a></span>
+    <span>&middot;</span>
+    <span>Powered by <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a></span>
+    <span>&middot;</span>
+    <span>Theme <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a></span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)">
+    <button class="top-link" id="top-link" type="button" accesskey="g">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+            <path d="M12 6H0l6-6z" />
+        </svg>
+    </button>
+</a>
+
+
+
+<script defer src="https://bradleyjkemp.dev/assets/js/highlight.min.27cd435cc9ed6abb4b496581b151804f79f366c412620272bb94e2f5f598ebcc.js" integrity="sha256-J81DXMntartLSWWBsVGAT3nzZsQSYgJyu5Ti9fWY68w="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<script>
+    window.onload = function () {
+        if (localStorage.getItem("menu-scroll-position")) {
+            document.getElementById('menu').scrollLeft = localStorage.getItem("menu-scroll-position");
+        }
+    }
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+    function menu_on_scroll() {
+        localStorage.setItem("menu-scroll-position", document.getElementById('menu').scrollLeft);
+    }
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+
+</body>
+
+</html>

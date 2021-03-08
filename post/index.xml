@@ -6,7 +6,17 @@
     <description>Recent content in Posts on bradleyjkemp</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 08 Feb 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://bradleyjkemp.dev/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 08 Mar 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://bradleyjkemp.dev/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Simple A/B testing with Caddy and Plausible Analytics</title>
+      <link>https://bradleyjkemp.dev/post/simple-a/b-testing-with-caddy-and-plausible-analytics/</link>
+      <pubDate>Mon, 08 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://bradleyjkemp.dev/post/simple-a/b-testing-with-caddy-and-plausible-analytics/</guid>
+      <description>A/B testing is a life saver for a solo SaaS developer. While it&amp;rsquo;s hard to predict whether a 14-day or 1-month trial is going to get a better signup rate, it&amp;rsquo;s really simple to test: show half of people the 14-day button and the other half the 1-month button and just measure the click-through rate.
+There&amp;rsquo;s loads of tools out there to help you do this, but rule #1 of running a micro-SaaS like QueryCal is to keep your technology stack simple&amp;mdash;it&amp;rsquo;s better to focus your time on features not integrating a bunch of different technologies.</description>
+    </item>
+    
     <item>
       <title>Assurance alerts: when measuring false-positive rate can be misleading</title>
       <link>https://bradleyjkemp.dev/post/assurance-alerts-when-measuring-false-positive-rate-can-be-misleading/</link>
