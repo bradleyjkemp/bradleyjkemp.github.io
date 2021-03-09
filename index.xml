@@ -14,8 +14,8 @@
       
       <guid>https://bradleyjkemp.dev/post/simple-a/b-testing-with-caddy-and-plausible-analytics/</guid>
       <description>This post first appeared on the QueryCal technical blog.
- A/B testing is a life saver for a solo SaaS developer. While it&amp;rsquo;s hard to predict whether a 14-day or 1-month trial is going to get a better signup rate, it&amp;rsquo;s really simple to test: show half of people the 14-day button and the other half the 1-month button and just measure the click-through rate.
-There&amp;rsquo;s loads of tools out there to help you do this, but rule #1 of running a micro-SaaS like QueryCal is to keep your technology stack simple&amp;mdash;it&amp;rsquo;s better to focus your time on features not integrating a bunch of different technologies.</description>
+ A/B testing is a lifesaver for a solo SaaS developer. While it&amp;rsquo;s hard to predict whether a 14-day or 1-month trial is going to get a better signup rate, it&amp;rsquo;s really simple to test: show half of people the 14-day button and the other half the 1-month button and just measure the click-through rate.
+There are loads of tools out there to help you do this, but rule #1 of running a micro-SaaS like QueryCal is to keep your technology stack simple&amp;mdash;it&amp;rsquo;s better to focus your time on features not integrating a bunch of different technologies.</description>
     </item>
     
     <item>
