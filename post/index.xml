@@ -6,7 +6,18 @@
     <description>Recent content in Posts on bradleyjkemp</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 14 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://bradleyjkemp.dev/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 05 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://bradleyjkemp.dev/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>LaunchDaemon Hijacking: privilege escalation and persistence via insecure folder permissions</title>
+      <link>https://bradleyjkemp.dev/post/launchdaemon-hijacking/</link>
+      <pubDate>Wed, 05 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://bradleyjkemp.dev/post/launchdaemon-hijacking/</guid>
+      <description>LaunchDaemon (or LaunchAgent) Hijacking is a MacOS privilege escalation and persistence technique. It involves abusing insecure file/folder permissions to replace legitimately installed, misconfigured LaunchDaemons with malicious code.
+I first spotted this issue affecting the OSQuery installer but went looking and found multiple other products with the same problem. This isn&amp;rsquo;t a novel technique (it&amp;rsquo;s briefly mentioned in T1543.004) but I was surprised to find it so rarely talked about.
+Example &amp;ndash; Hijacking the OSQuery LaunchDaemon  #callout { background: var(--code-bg); padding: 1.</description>
+    </item>
+    
     <item>
       <title>6 ways to detect phishing sites using high-entropy strings</title>
       <link>https://bradleyjkemp.dev/post/6-ways-to-detect-phishing-sites-using-high-entropy-strings/</link>

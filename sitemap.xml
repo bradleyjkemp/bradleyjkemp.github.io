@@ -3,17 +3,22 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://bradleyjkemp.dev/post/6-ways-to-detect-phishing-sites-using-high-entropy-strings/</loc>
-    <lastmod>2021-04-14T00:00:00+00:00</lastmod>
+    <loc>https://bradleyjkemp.dev/</loc>
+    <lastmod>2021-05-05T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://bradleyjkemp.dev/</loc>
-    <lastmod>2021-04-14T00:00:00+00:00</lastmod>
+    <loc>https://bradleyjkemp.dev/post/launchdaemon-hijacking/</loc>
+    <lastmod>2021-05-05T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://bradleyjkemp.dev/post/</loc>
+    <lastmod>2021-05-05T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://bradleyjkemp.dev/post/6-ways-to-detect-phishing-sites-using-high-entropy-strings/</loc>
     <lastmod>2021-04-14T00:00:00+00:00</lastmod>
   </url>
   
