@@ -6,11 +6,11 @@
     <description>Recent content in Posts on bradleyjkemp</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 05 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://bradleyjkemp.dev/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 10 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://bradleyjkemp.dev/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>LaunchDaemon Hijacking: privilege escalation and persistence via insecure folder permissions</title>
       <link>https://bradleyjkemp.dev/post/launchdaemon-hijacking/</link>
-      <pubDate>Wed, 05 May 2021 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 10 May 2021 00:00:00 +0000</pubDate>
       
       <guid>https://bradleyjkemp.dev/post/launchdaemon-hijacking/</guid>
       <description>LaunchDaemon (or LaunchAgent) Hijacking is a MacOS privilege escalation and persistence technique. It involves abusing insecure file/folder permissions to replace legitimately installed, misconfigured LaunchDaemons with malicious code.
