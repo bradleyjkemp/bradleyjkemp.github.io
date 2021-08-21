@@ -6,7 +6,19 @@
     <description>Recent content in Posts on bradleyjkemp</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Mon, 10 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://bradleyjkemp.dev/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 21 Aug 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://bradleyjkemp.dev/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>A Suspicious CVC</title>
+      <link>https://bradleyjkemp.dev/post/suspicious-cvc/</link>
+      <pubDate>Sat, 21 Aug 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://bradleyjkemp.dev/post/suspicious-cvc/</guid>
+      <description>I once got a debit card with the CVC number 000.
+Now, in theory, I know there&amp;rsquo;s nothing wrong with this. The number was chosen randomly and it being &amp;ldquo;special&amp;rdquo; is purely in my head.
+In fact, if 000 were excluded from the picking process, there&amp;rsquo;d be fewer possible CVCs and so overall they&amp;rsquo;d be less secure.
+But, 000 still feels really wrong as a CVC. Was it a bug? Did an entire batch of cards get generated with the same CVC?</description>
+    </item>
+    
     <item>
       <title>LaunchDaemon Hijacking: privilege escalation and persistence via insecure folder permissions</title>
       <link>https://bradleyjkemp.dev/post/launchdaemon-hijacking/</link>
