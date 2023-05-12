@@ -1,68 +1,42 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  
   <url>
     <loc>https://bradleyjkemp.dev/post/are-you-building-features-for-phishers/</loc>
     <lastmod>2022-01-06T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://bradleyjkemp.dev/</loc>
     <lastmod>2022-01-06T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://bradleyjkemp.dev/post/</loc>
     <lastmod>2022-01-06T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://bradleyjkemp.dev/post/suspicious-cvc/</loc>
     <lastmod>2021-08-21T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://bradleyjkemp.dev/post/launchdaemon-hijacking/</loc>
     <lastmod>2021-05-10T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://bradleyjkemp.dev/post/6-ways-to-detect-phishing-sites-using-high-entropy-strings/</loc>
     <lastmod>2021-04-14T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://bradleyjkemp.dev/post/simple-a/b-testing-with-caddy-and-plausible-analytics/</loc>
     <lastmod>2021-03-08T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://bradleyjkemp.dev/post/assurance-alerts-when-measuring-false-positive-rate-can-be-misleading/</loc>
     <lastmod>2021-02-08T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://bradleyjkemp.dev/post/spending-your-security-goodwill-budget-wisely/</loc>
     <lastmod>2021-01-04T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://bradleyjkemp.dev/post/how-intrusion-detection-honeypots-work-so-well/</loc>
     <lastmod>2020-12-08T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://bradleyjkemp.dev/post/snapshot-testing-is-hard-pitfalls-to-avoid/</loc>
+  </url><url>
+    <loc>https://bradleyjkemp.dev/post/snapshot-testing-is-hard--pitfalls-to-avoid/</loc>
     <lastmod>2017-12-19T12:21:26+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://bradleyjkemp.dev/categories/</loc>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://bradleyjkemp.dev/tags/</loc>
   </url>
-  
 </urlset>

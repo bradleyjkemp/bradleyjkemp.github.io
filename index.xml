@@ -14,7 +14,7 @@
       
       <guid>https://bradleyjkemp.dev/post/are-you-building-features-for-phishers/</guid>
       <description>People expect companies/services to tell them when untoward things could be happening to their accounts:
- Their account has logged in on a new device Their password has been changed An export of their data was started  These examples are things you should probably be notified about. But, if you go overboard with these warnings, you might find phishers triggering them intentionally.
+Their account has logged in on a new device Their password has been changed An export of their data was started These examples are things you should probably be notified about. But, if you go overboard with these warnings, you might find phishers triggering them intentionally.
 A bad security warning Imagine receiving this warning email:</description>
     </item>
     
@@ -38,7 +38,7 @@ But, 000 still feels really wrong as a CVC. Was it a bug? Did an entire batch of
       <guid>https://bradleyjkemp.dev/post/launchdaemon-hijacking/</guid>
       <description>LaunchDaemon (or LaunchAgent) Hijacking is a MacOS privilege escalation and persistence technique. It involves abusing insecure file/folder permissions to replace legitimately installed, misconfigured LaunchDaemons with malicious code.
 I first spotted this issue affecting the OSQuery installer but went looking and found multiple other products with the same problem. This isn&amp;rsquo;t a novel technique (it&amp;rsquo;s briefly mentioned in T1543.004) but I was surprised to find it so rarely talked about.
-Example &amp;ndash; Hijacking the OSQuery LaunchDaemon  #callout { background: var(--code-bg); padding: 1.</description>
+Example &amp;ndash; Hijacking the OSQuery LaunchDaemon 😇 I&amp;rsquo;ve already disclosed this issue to the OSQuery team and they kindly let me use it as an example in this post.</description>
     </item>
     
     <item>
@@ -58,7 +58,7 @@ These sorts of long, random strings are extremely good indicators for tracking p
       
       <guid>https://bradleyjkemp.dev/post/simple-a/b-testing-with-caddy-and-plausible-analytics/</guid>
       <description>This post first appeared on the QueryCal technical blog.
- A/B testing is a lifesaver for a solo SaaS developer. While it&amp;rsquo;s hard to predict whether a 14-day or 1-month trial is going to get a better signup rate, it&amp;rsquo;s really simple to test: show half of people the 14-day button and the other half the 1-month button and just measure the click-through rate.
+A/B testing is a lifesaver for a solo SaaS developer. While it&amp;rsquo;s hard to predict whether a 14-day or 1-month trial is going to get a better signup rate, it&amp;rsquo;s really simple to test: show half of people the 14-day button and the other half the 1-month button and just measure the click-through rate.
 There are loads of tools out there to help you do this, but rule #1 of running a micro-SaaS like QueryCal is to keep your technology stack simple&amp;mdash;it&amp;rsquo;s better to focus your time on features, not integrating a bunch of different technologies.</description>
     </item>
     
@@ -95,10 +95,10 @@ Unfortunately, that&amp;rsquo;s about as far as most people get with them.</desc
     
     <item>
       <title>Snapshot Testing Is Hard -- Pitfalls To Avoid</title>
-      <link>https://bradleyjkemp.dev/post/snapshot-testing-is-hard-pitfalls-to-avoid/</link>
+      <link>https://bradleyjkemp.dev/post/snapshot-testing-is-hard--pitfalls-to-avoid/</link>
       <pubDate>Tue, 19 Dec 2017 12:21:26 +0000</pubDate>
       
-      <guid>https://bradleyjkemp.dev/post/snapshot-testing-is-hard-pitfalls-to-avoid/</guid>
+      <guid>https://bradleyjkemp.dev/post/snapshot-testing-is-hard--pitfalls-to-avoid/</guid>
       <description>Snapshot testing is an extremely fast way to add regression testing to an existing project. You simply take some example inputs and then snapshot the resulting outputs. From then on, you can have a high degree of confidence that any changes you make have not affected backwards compatibility (as this would have been detected as a change in a snapshot).
 However there are many pitfalls you can run into as I found when writing cupaloy, a snapshot testing library for Go.</description>
     </item>

