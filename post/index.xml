@@ -1,107 +1,90 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Posts on bradleyjkemp</title>
     <link>https://bradleyjkemp.dev/post/</link>
     <description>Recent content in Posts on bradleyjkemp</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo -- 0.122.0</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 06 Jan 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://bradleyjkemp.dev/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 06 Jan 2022 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://bradleyjkemp.dev/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Are you building features for phishers?</title>
       <link>https://bradleyjkemp.dev/post/are-you-building-features-for-phishers/</link>
       <pubDate>Thu, 06 Jan 2022 00:00:00 +0000</pubDate>
-      
       <guid>https://bradleyjkemp.dev/post/are-you-building-features-for-phishers/</guid>
       <description>People expect companies/services to tell them when untoward things could be happening to their accounts:
 Their account has logged in on a new device Their password has been changed An export of their data was started These examples are things you should probably be notified about. But, if you go overboard with these warnings, you might find phishers triggering them intentionally.
 A bad security warning Imagine receiving this warning email:</description>
     </item>
-    
     <item>
       <title>A Suspicious CVC</title>
       <link>https://bradleyjkemp.dev/post/suspicious-cvc/</link>
       <pubDate>Sat, 21 Aug 2021 00:00:00 +0000</pubDate>
-      
       <guid>https://bradleyjkemp.dev/post/suspicious-cvc/</guid>
       <description>I once got a debit card with the CVC number 000.
 Now, in theory, I know there&amp;rsquo;s nothing wrong with this. The number was chosen randomly and it being &amp;ldquo;special&amp;rdquo; is purely in my head.
 In fact, if 000 were excluded from the picking process, there&amp;rsquo;d be fewer possible CVCs and so overall they&amp;rsquo;d be less secure.
 But, 000 still feels really wrong as a CVC. Was it a bug? Did an entire batch of cards get generated with the same CVC?</description>
     </item>
-    
     <item>
       <title>LaunchDaemon Hijacking: privilege escalation and persistence via insecure folder permissions</title>
       <link>https://bradleyjkemp.dev/post/launchdaemon-hijacking/</link>
       <pubDate>Mon, 10 May 2021 00:00:00 +0000</pubDate>
-      
       <guid>https://bradleyjkemp.dev/post/launchdaemon-hijacking/</guid>
       <description>LaunchDaemon (or LaunchAgent) Hijacking is a MacOS privilege escalation and persistence technique. It involves abusing insecure file/folder permissions to replace legitimately installed, misconfigured LaunchDaemons with malicious code.
 I first spotted this issue affecting the OSQuery installer but went looking and found multiple other products with the same problem. This isn&amp;rsquo;t a novel technique (it&amp;rsquo;s briefly mentioned in T1543.004) but I was surprised to find it so rarely talked about.
 Example &amp;ndash; Hijacking the OSQuery LaunchDaemon 😇 I&amp;rsquo;ve already disclosed this issue to the OSQuery team and they kindly let me use it as an example in this post.</description>
     </item>
-    
     <item>
       <title>6 ways to detect phishing sites using high-entropy strings</title>
       <link>https://bradleyjkemp.dev/post/6-ways-to-detect-phishing-sites-using-high-entropy-strings/</link>
       <pubDate>Wed, 14 Apr 2021 00:00:00 +0000</pubDate>
-      
       <guid>https://bradleyjkemp.dev/post/6-ways-to-detect-phishing-sites-using-high-entropy-strings/</guid>
       <description>You&amp;rsquo;d expect phishing sites to be hard to detect and track, but actually, many of them contain HTML fragments that uniquely identify them. One example doing the rounds at the moment is a bunch of Royal Mail phishing sites which all contain the string css_4WjozGK8ccMNs2W9MfwvMVZNPzpmiyysOUq4_0NulQo.
 These sorts of long, random strings are extremely good indicators for tracking phishing sites. Any webpage that contains css_4WjozGK8ccMNs2W9MfwvMVZNPzpmiyysOUq4_0NulQo is almost certainly an instance of that Royal Mail phishing kit.</description>
     </item>
-    
     <item>
       <title>Simple A/B testing with Caddy and Plausible Analytics</title>
       <link>https://bradleyjkemp.dev/post/simple-a/b-testing-with-caddy-and-plausible-analytics/</link>
       <pubDate>Mon, 08 Mar 2021 00:00:00 +0000</pubDate>
-      
       <guid>https://bradleyjkemp.dev/post/simple-a/b-testing-with-caddy-and-plausible-analytics/</guid>
       <description>This post first appeared on the QueryCal technical blog.
 A/B testing is a lifesaver for a solo SaaS developer. While it&amp;rsquo;s hard to predict whether a 14-day or 1-month trial is going to get a better signup rate, it&amp;rsquo;s really simple to test: show half of people the 14-day button and the other half the 1-month button and just measure the click-through rate.
 There are loads of tools out there to help you do this, but rule #1 of running a micro-SaaS like QueryCal is to keep your technology stack simple&amp;mdash;it&amp;rsquo;s better to focus your time on features, not integrating a bunch of different technologies.</description>
     </item>
-    
     <item>
       <title>Assurance alerts: when measuring false-positive rate can be misleading</title>
       <link>https://bradleyjkemp.dev/post/assurance-alerts-when-measuring-false-positive-rate-can-be-misleading/</link>
       <pubDate>Mon, 08 Feb 2021 00:00:00 +0000</pubDate>
-      
       <guid>https://bradleyjkemp.dev/post/assurance-alerts-when-measuring-false-positive-rate-can-be-misleading/</guid>
       <description>Nobody likes alerts that feel like a waste of time to review. But, how do you tell whether an alert is actually a waste of time?
 The go-to metric to use is false-positive rate&amp;mdash;if an alert has high a false-positive rate then it&amp;rsquo;s &amp;ldquo;noisy&amp;rdquo; and might be getting rid of. But, trying to distill the performance of an alert down to a single number is hard and false-positive rate might be a particularly bad choice.</description>
     </item>
-    
     <item>
       <title>Spending your security goodwill budget wisely</title>
       <link>https://bradleyjkemp.dev/post/spending-your-security-goodwill-budget-wisely/</link>
       <pubDate>Mon, 04 Jan 2021 00:00:00 +0000</pubDate>
-      
       <guid>https://bradleyjkemp.dev/post/spending-your-security-goodwill-budget-wisely/</guid>
       <description>Making users more secure generally means annoying them. Whether it&amp;rsquo;s making them carry a hardware security key or just enforcing a short screensaver timeout, changing how people go about their work is annoying&amp;mdash;and an annoyed user is not a secure user.
 The effectiveness of a lot of security controls relies on the user cooperating. If they get frustrated with all the barriers and friction between them and doing their actual job, they might just find ways around the controls&amp;mdash;their shortened screensaver timeout is soon &amp;ldquo;fixed&amp;rdquo; with a keep-awake app and now they&amp;rsquo;re less secure than they were before.</description>
     </item>
-    
     <item>
       <title>How intrusion detection honeypots work so well</title>
       <link>https://bradleyjkemp.dev/post/how-intrusion-detection-honeypots-work-so-well/</link>
       <pubDate>Tue, 08 Dec 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://bradleyjkemp.dev/post/how-intrusion-detection-honeypots-work-so-well/</guid>
       <description>Intrusion detection honeypots are just plain cool. They&amp;rsquo;re incredibly simple to run and give you extremely accurate alerts about intruders in your systems.
 A honeypot can be as simple as a fake server inside your network that alerts if anyone connects to it. There&amp;rsquo;s no reason to intentionally connect to this bogus server, so any attempts are probably an attacker already inside your network.
 Unfortunately, that&amp;rsquo;s about as far as most people get with them.</description>
     </item>
-    
     <item>
       <title>Snapshot Testing Is Hard -- Pitfalls To Avoid</title>
       <link>https://bradleyjkemp.dev/post/snapshot-testing-is-hard--pitfalls-to-avoid/</link>
       <pubDate>Tue, 19 Dec 2017 12:21:26 +0000</pubDate>
-      
       <guid>https://bradleyjkemp.dev/post/snapshot-testing-is-hard--pitfalls-to-avoid/</guid>
       <description>Snapshot testing is an extremely fast way to add regression testing to an existing project. You simply take some example inputs and then snapshot the resulting outputs. From then on, you can have a high degree of confidence that any changes you make have not affected backwards compatibility (as this would have been detected as a change in a snapshot).
 However there are many pitfalls you can run into as I found when writing cupaloy, a snapshot testing library for Go.</description>
     </item>
-    
   </channel>
 </rss>
